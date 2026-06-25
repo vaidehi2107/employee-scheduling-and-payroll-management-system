@@ -1,0 +1,279 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Sora:wght@600;700&display=swap');
+
+/* ── Page ── */
+.attendance-container {
+    padding: 36px 40px;
+    background-color: #eeeef8;
+    min-height: 100%;
+    font-family: 'DM Sans', sans-serif;
+}
+
+/* ── Header ── */
+.attendance-header {
+    margin-top: -15px;
+    margin-bottom: 32px;
+}
+
+.emp-title {
+    font-family: 'Sora', sans-serif;
+    font-size: 30px;
+    font-weight: 700;
+    color: #1a1a2e;
+    letter-spacing: -0.02em;
+    margin-bottom: 6px;
+}
+
+.attendance-header p {
+    font-size: 14px;
+    color: #888;
+}
+
+/* ── Filter section ── */
+.filter-section {
+    background: #ffffff;
+    padding: 24px;
+    border-radius: 16px;
+    border: 1px solid #ececf5;
+    box-shadow: 0 2px 12px rgba(100, 80, 180, 0.06);
+    display: flex;
+    gap: 16px;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    margin-bottom: 24px;
+}
+
+.filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    width: 220px;
+}
+
+.filter-group label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #888;
+}
+
+.filter-group input,
+.filter-group select {
+    padding: 11px 14px;
+    border: 1.5px solid #e4e4f0;
+    border-radius: 10px;
+    min-width: 200px;
+    font-size: 14px;
+    font-family: 'DM Sans', sans-serif;
+    color: #1a1a2e;
+    background: #f9f9fc;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+}
+
+.filter-group input:focus,
+.filter-group select:focus {
+    border-color: #7c5cbf;
+    box-shadow: 0 0 0 3px rgba(124, 92, 191, 0.1);
+    background: #fff;
+}
+
+/* DatePicker override */
+.date-picker {
+    padding: 11px 14px;
+    border: 1.5px solid #e4e4f0;
+    border-radius: 10px;
+    min-width: 200px;
+    font-size: 14px;
+    font-family: 'DM Sans', sans-serif;
+    color: #1a1a2e;
+    background: #f9f9fc;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.date-picker:focus {
+    border-color: #7c5cbf;
+    box-shadow: 0 0 0 3px rgba(124, 92, 191, 0.1);
+    background: #fff;
+}
+
+/* ── Search button ── */
+.search-btn {
+    padding: 11px 24px;
+    background: linear-gradient(135deg, #7c5cbf, #5c3fa3);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+    box-shadow: 0 4px 14px rgba(92, 63, 163, 0.3);
+    transition: opacity 0.2s, transform 0.15s;
+}
+
+.search-btn:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+}
+
+/* ── Table container ── */
+.table-container {
+    background: #ffffff;
+    border-radius: 16px;
+    border: 1px solid #ececf5;
+    box-shadow: 0 2px 12px rgba(100, 80, 180, 0.06);
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+}
+
+thead th:nth-child(1) { width: 125px; }
+thead th:nth-child(2) { width: 60px; } /* Date */
+/* add this after thead th:nth-child(2) */
+thead th:last-child { width: 85px; }
+
+
+thead {
+    background: #f9f9fc;
+    border-bottom: 2px solid #ececf5;
+    text-align: center;
+}
+
+thead th {
+    padding: 14px 18px;
+    text-align: left;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #888;
+    text-align: center;
+}
+
+tbody td {
+    padding: 16px 18px;
+    border-top: 1px solid #f0f0f8;
+    font-size: 14px;
+    color: #3a3a5c;
+    text-align: center;
+}
+
+tbody tr:hover {
+    background: rgba(124, 92, 191, 0.04);
+}
+
+.break-header {
+    text-align: center;
+}
+/* ── Add Attendance button ── */
+.add-emp-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 11px 20px;
+    background: linear-gradient(135deg, #7c5cbf, #5c3fa3);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+    text-decoration: none;
+    box-shadow: 0 4px 14px rgba(92, 63, 163, 0.3);
+    transition: opacity 0.2s, transform 0.15s;
+}
+
+.add-emp-btn:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+}
+
+/* ── Row action buttons ── */
+.emp-actions {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+}
+
+.action-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.15s;
+}
+
+.action-btn.edit {
+    background: rgba(124, 92, 191, 0.1);
+    color: #7c5cbf;
+}
+
+.action-btn.edit:hover {
+    background: rgba(124, 92, 191, 0.2);
+    transform: translateY(-1px);
+}
+
+.action-btn.delete {
+    background: rgba(220, 53, 69, 0.08);
+    color: #dc3545;
+}
+
+.action-btn.delete:hover {
+    background: rgba(220, 53, 69, 0.16);
+    transform: translateY(-1px);
+}
+
+/* ── Toast notification ── */
+.toast {
+    position: fixed;
+    bottom: 32px;
+    right: 32px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 20px;
+    border-radius: 12px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    color: #fff;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+    z-index: 9999;
+    animation: toastIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.toast-success {
+    background: linear-gradient(135deg, #7c5cbf, #5c3fa3);
+}
+
+.toast-delete {
+    background: linear-gradient(135deg, #e05260, #c0392b);
+}
+
+@keyframes toastIn {
+    from { opacity: 0; transform: translateY(16px) scale(0.95); }
+    to   { opacity: 1; transform: translateY(0)   scale(1);     }
+}
+
+/* ── Earnings cells ── */
+.earnings-cell {
+    color: #2d7a4f;
+    font-weight: 600;
+}
+
+.total-cell {
+    color: #1a1a2e;
+    font-weight: 700;
+    background: rgba(124, 92, 191, 0.05);
+}

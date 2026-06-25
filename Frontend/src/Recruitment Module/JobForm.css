@@ -1,0 +1,213 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Sora:wght@600;700&display=swap');
+
+.jf-page {
+    padding: 36px 40px;
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100%;
+    background: #eeeef8;
+}
+
+/* ── Header ── */
+.jf-header {
+    margin-top: -15px;
+    margin-bottom: 28px;
+}
+.jf-back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: none;
+    border: none;
+    color: #7c5cbf;
+    font-size: 13px;
+    font-weight: 600;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+    padding: 0;
+    margin-bottom: 14px;
+    transition: opacity 0.2s;
+}
+.jf-back-btn:hover { opacity: 0.7; }
+.jf-title {
+    font-family: 'Sora', sans-serif;
+    font-size: 28px;
+    font-weight: 700;
+    color: #1a1a2e;
+    letter-spacing: -0.02em;
+    margin-bottom: 4px;
+}
+.jf-subtitle { font-size: 14px; color: #888; }
+
+/* ── Body ── */
+.jf-body { display: flex; flex-direction: column; gap: 20px; }
+
+/* ── Card ── */
+.jf-card {
+    background: #fff;
+    border-radius: 16px;
+    padding: 24px 28px;
+    border: 1px solid #ececf5;
+    box-shadow: 0 2px 12px rgba(100,80,180,0.06);
+}
+.jf-section-title {
+    font-family: 'Sora', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    color: #1a1a2e;
+    margin: 0 0 20px;
+}
+
+/* ── Grid ── */
+.jf-grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 16px;
+}
+
+/* ── Field ── */
+.jf-field { display: flex; flex-direction: column; gap: 6px; }
+.jf-field-full { margin-top: 4px; }
+.jf-label {
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: #888;
+}
+.jf-req { color: #e05252; }
+
+.jf-input {
+    padding: 10px 14px;
+    border: 1.5px solid #e0ddf5;
+    border-radius: 10px;
+    font-size: 14px;
+    font-family: 'DM Sans', sans-serif;
+    color: #1a1a2e;
+    background: #fafafe;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    width: 100%;
+    box-sizing: border-box;
+}
+.jf-input:focus {
+    border-color: #7c5cbf;
+    box-shadow: 0 0 0 3px rgba(124,92,191,0.10);
+    background: #fff;
+}
+.jf-input-error { border-color: #e05252 !important; }
+.jf-error { font-size: 11px; color: #e05252; font-weight: 500; }
+
+.jf-textarea {
+    padding: 10px 14px;
+    border: 1.5px solid #e0ddf5;
+    border-radius: 10px;
+    font-size: 14px;
+    font-family: 'DM Sans', sans-serif;
+    color: #1a1a2e;
+    background: #fafafe;
+    outline: none;
+    resize: vertical;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    width: 100%;
+    box-sizing: border-box;
+}
+.jf-textarea:focus {
+    border-color: #7c5cbf;
+    box-shadow: 0 0 0 3px rgba(124,92,191,0.10);
+    background: #fff;
+}
+
+/* ── Dynamic list rows ── */
+.jf-list-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 10px;
+}
+.jf-list-remove {
+    width: 30px;
+    height: 30px;
+    border-radius: 8px;
+    border: none;
+    background: #fef0f0;
+    color: #e05252;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: background 0.2s, color 0.2s;
+}
+.jf-list-remove:hover { background: #e05252; color: white; }
+
+.jf-list-add {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: none;
+    border: 1.5px dashed #c8c4e8;
+    border-radius: 8px;
+    padding: 7px 14px;
+    font-size: 13px;
+    font-weight: 600;
+    font-family: 'DM Sans', sans-serif;
+    color: #7c5cbf;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+    margin-top: 2px;
+}
+.jf-list-add:hover { border-color: #7c5cbf; background: rgba(124,92,191,0.05); }
+
+/* Skills grid */
+.jf-skills-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+.jf-skill-row { display: flex; align-items: center; gap: 8px; }
+
+/* ── Submit row ── */
+.jf-submit-row {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    padding-bottom: 24px;
+}
+.jf-cancel-btn {
+    padding: 12px 24px;
+    background: #fff;
+    border: 1.5px solid #e0ddf5;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    font-family: 'DM Sans', sans-serif;
+    color: #888;
+    cursor: pointer;
+    transition: border-color 0.2s, color 0.2s;
+}
+.jf-cancel-btn:hover { border-color: #aaa; color: #444; }
+
+.jf-submit-btn {
+    padding: 12px 28px;
+    background: linear-gradient(135deg, #7c5cbf, #5c3fa3);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+    box-shadow: 0 4px 14px rgba(92,63,163,0.3);
+    transition: opacity 0.2s, transform 0.15s;
+}
+.jf-submit-btn:hover:not(:disabled) { opacity: 0.9; transform: translateY(-1px); }
+.jf-submit-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+/* Responsive */
+@media (max-width: 640px) {
+    .jf-page { padding: 20px 16px; }
+    .jf-grid-2 { grid-template-columns: 1fr; }
+    .jf-skills-grid { grid-template-columns: 1fr; }
+}

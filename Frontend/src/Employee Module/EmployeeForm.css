@@ -1,0 +1,495 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Sora:wght@600;700&display=swap');
+
+/* ── Page ── */
+.container {
+    background: #eeeef8;
+    min-height: 100%;
+    font-family: 'DM Sans', sans-serif;
+}
+
+.main {
+    padding: 36px 40px;
+    display: flex;
+    flex-direction: column;
+}
+
+/* ── Page header ── */
+.form-page-header {
+    margin-bottom: 28px;
+}
+
+.form-page-title {
+    font-family: 'Sora', sans-serif;
+    font-size: 28px;
+    font-weight: 700;
+    color: #1a1a2e;
+    letter-spacing: -0.02em;
+    margin-bottom: 6px;
+}
+
+.form-page-sub {
+    font-size: 14px;
+    color: #888;
+}
+
+/* ── Form ── */
+.employee-form {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+/* ── Section cards ── */
+.form-section {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 28px;
+    border: 1px solid #ececf5;
+    box-shadow: 0 2px 12px rgba(100, 80, 180, 0.06);
+    margin-bottom: 20px;
+}
+
+.section-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: 'Sora', sans-serif;
+    font-size: 16px;
+    font-weight: 600;
+    color: #1a1a2e;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #f0f0f8;
+}
+
+.section-title svg {
+    color: #7c5cbf;
+    flex-shrink: 0;
+}
+
+/* ── Form rows ── */
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 16px;
+}
+
+.form-row:last-child { margin-bottom: 0; }
+
+/* ── Address side by side ── */
+.address-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.address-section {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 28px;
+    border: 1px solid #ececf5;
+    box-shadow: 0 2px 12px rgba(100, 80, 180, 0.06);
+}
+
+/* ── Field group ── */
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.form-group label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #888;
+}
+
+/* ── All inputs ── */
+.form-group input,
+.form-section input,
+.address-section input {
+    padding: 11px 14px;
+    border: 1.5px solid #e4e4f0;
+    border-radius: 10px;
+    font-size: 14px;
+    font-family: 'DM Sans', sans-serif;
+    color: #1a1a2e;
+    background: #f9f9fc;
+    outline: none;
+    width: 100%;
+    transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+}
+
+.form-group input:focus,
+.form-section input:focus,
+.address-section input:focus {
+    border-color: #7c5cbf;
+    box-shadow: 0 0 0 3px rgba(124, 92, 191, 0.1);
+    background: #fff;
+}
+
+.form-group input::placeholder,
+.form-section input::placeholder,
+.address-section input::placeholder {
+    color: #bbb;
+}
+
+/* ── DatePicker ── */
+.react-datepicker-wrapper { width: 100%; }
+
+.react-datepicker-wrapper input {
+    padding: 11px 14px;
+    border: 1.5px solid #e4e4f0;
+    border-radius: 10px;
+    font-size: 14px;
+    font-family: 'DM Sans', sans-serif;
+    color: #1a1a2e;
+    background: #f9f9fc;
+    outline: none;
+    width: 100%;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.react-datepicker-wrapper input:focus {
+    border-color: #7c5cbf;
+    box-shadow: 0 0 0 3px rgba(124, 92, 191, 0.1);
+    background: #fff;
+}
+
+/* ── Address inner fields ── */
+.addr-fields {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.addr-fields-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+/* ── Footer ── */
+.form-footer {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 12px;
+    padding-top: 4px;
+    margin-bottom: 32px;
+}
+
+.btn-cancel {
+    padding: 12px 24px;
+    background: transparent;
+    border: none;
+    color: #888;
+    font-size: 14px;
+    font-weight: 600;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+    border-radius: 10px;
+    transition: background 0.2s, color 0.2s;
+}
+
+.btn-cancel:hover {
+    background: rgba(0,0,0,0.05);
+    color: #444;
+    opacity: 1;
+}
+
+.btn-submit {
+    padding: 12px 28px;
+    background: linear-gradient(135deg, #7c5cbf, #5c3fa3);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+    box-shadow: 0 4px 14px rgba(92, 63, 163, 0.35);
+    transition: opacity 0.2s, transform 0.15s;
+}
+
+.btn-submit:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+}
+
+/* hide old elements */
+.view-btn-container, .add-btn { display: none; }
+
+/* ── Form header row ── */
+.form-header-row {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+}
+
+.view-emp-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 11px 20px;
+    background: #ffffff;
+    color: #7c5cbf;
+    border: 1.5px solid #c8c4e8;
+    border-radius: 10px;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 600;
+    font-family: 'DM Sans', sans-serif;
+    transition: background 0.2s, border-color 0.2s, transform 0.15s;
+    white-space: nowrap;
+}
+
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.salary-structure-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 11px 20px;
+    background: rgba(124, 92, 191, 0.08);
+    color: #7c5cbf;
+    border: 1.5px solid #c8c4e8;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background 0.2s, border-color 0.2s, transform 0.15s;
+}
+
+.salary-structure-btn:hover {
+    background: rgba(124, 92, 191, 0.15);
+    border-color: #7c5cbf;
+    transform: translateY(-1px);
+}
+
+.view-emp-btn:hover {
+    background: rgba(124, 92, 191, 0.06);
+    border-color: #7c5cbf;
+    transform: translateY(-1px);
+}
+
+/* ── Wages Section ── */
+.wages-section .section-title {
+    justify-content: flex-start;
+    gap: 10px;
+}
+
+.btn-add-wage {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-left: auto;
+    padding: 7px 14px;
+    background: rgba(124, 92, 191, 0.08);
+    color: #7c5cbf;
+    border: 1.5px solid #c8c4e8;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+    transition: background 0.2s, border-color 0.2s;
+    opacity: 1;
+}
+
+.btn-add-wage:hover {
+    background: rgba(124, 92, 191, 0.15);
+    border-color: #7c5cbf;
+    opacity: 1;
+}
+
+/* ── Inline wage form ── */
+.wage-form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr auto;
+    gap: 14px;
+    align-items: flex-end;
+    background: #f5f4fc;
+    border: 1.5px dashed #c8c4e8;
+    border-radius: 12px;
+    padding: 18px 20px;
+    margin-bottom: 20px;
+}
+
+.wage-select {
+    padding: 11px 14px;
+    border: 1.5px solid #e4e4f0;
+    border-radius: 10px;
+    font-size: 14px;
+    font-family: 'DM Sans', sans-serif;
+    color: #1a1a2e;
+    background: #f9f9fc;
+    outline: none;
+    width: 100%;
+    cursor: pointer;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    padding-right: 32px;
+}
+
+.wage-select:focus {
+    border-color: #7c5cbf;
+    box-shadow: 0 0 0 3px rgba(124, 92, 191, 0.1);
+    background-color: #fff;
+}
+
+.wage-form-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.btn-wage-save {
+    padding: 10px 18px;
+    background: linear-gradient(135deg, #7c5cbf, #5c3fa3);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+    opacity: 1;
+    transition: opacity 0.2s, transform 0.15s;
+    box-shadow: 0 3px 10px rgba(92, 63, 163, 0.3);
+}
+
+.btn-wage-save:hover {
+    opacity: 0.88;
+    transform: translateY(-1px);
+}
+
+.btn-wage-cancel {
+    padding: 10px 18px;
+    background: transparent;
+    border: 1.5px solid #e4e4f0;
+    color: #888;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+    opacity: 1;
+    transition: background 0.2s, color 0.2s;
+}
+
+.btn-wage-cancel:hover {
+    background: rgba(0,0,0,0.04);
+    color: #444;
+    opacity: 1;
+}
+
+/* ── Wages table ── */
+.wages-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+}
+
+.wages-table thead tr {
+    background: #f5f4fc;
+    border-radius: 8px;
+}
+
+.wages-table th {
+    padding: 11px 16px;
+    text-align: center;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: #888;
+}
+
+.wages-table th:first-child { border-radius: 8px 0 0 8px; }
+.wages-table th:last-child  { border-radius: 0 8px 8px 0; }
+
+.wages-table td {
+    padding: 13px 16px;
+    color: #1a1a2e;
+    border-bottom: 1px solid #f0f0f8;
+}
+
+.wages-table tbody tr:last-child td { border-bottom: none; }
+
+.wages-table tbody tr:hover {
+    background: #faf9ff;
+}
+
+.wage-row-editing td {
+    background: #f5f4fc;
+}
+
+.ot-badge {
+    display: inline-block;
+    padding: 3px 10px;
+    background: rgba(124, 92, 191, 0.1);
+    color: #7c5cbf;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.wage-actions-cell {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.icon-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.15s;
+    opacity: 1;
+    background: transparent;
+    padding: 0;
+}
+
+.edit-btn { color: #7c5cbf; }
+.edit-btn:hover {
+    background: rgba(124, 92, 191, 0.1);
+    transform: translateY(-1px);
+    opacity: 1;
+}
+
+.delete-btn { color: #e05c5c; }
+.delete-btn:hover {
+    background: rgba(224, 92, 92, 0.1);
+    transform: translateY(-1px);
+    opacity: 1;
+}
+
+/* ── Empty state ── */
+.wages-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 32px;
+    color: #bbb;
+    font-size: 13px;
+}

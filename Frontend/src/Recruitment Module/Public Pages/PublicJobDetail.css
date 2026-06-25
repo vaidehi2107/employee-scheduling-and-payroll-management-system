@@ -1,0 +1,395 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Sora:wght@600;700&display=swap');
+
+/* ─────────────────────────────────────────
+   PUBLIC JOB DETAIL PAGE
+   Route: /careers/:companyId/:jobId
+───────────────────────────────────────── */
+
+/* Page shell */
+.pjd-page {
+    min-height: 100vh;
+    background: #f4f4fb;
+    font-family: 'DM Sans', sans-serif;
+    box-sizing: border-box;
+}
+
+/* ── Top nav bar ── */
+.pjd-topbar {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(255, 255, 255, 0.92);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-bottom: 1px solid #ececf5;
+}
+.pjd-topbar-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 40px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.pjd-topbar-brand-wrap {
+    display: flex;
+    align-items: center;
+}
+.pjd-topbar-logo {
+    height: 32px;
+    width: auto;
+    object-fit: contain;
+}
+.pjd-topbar-brand {
+    font-family: 'Sora', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    background: linear-gradient(135deg, #7c5cbf, #5c3fa3);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+.pjd-topbar-link {
+    font-size: 13px;
+    font-weight: 600;
+    color: #7c5cbf;
+    text-decoration: none;
+    transition: opacity 0.2s;
+}
+.pjd-topbar-link:hover { opacity: 0.7; }
+
+/* ── Container & layout ── */
+.pjd-container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 36px 40px 60px;
+}
+.pjd-layout {
+    display: flex;
+    align-items: flex-start;
+    gap: 24px;
+}
+
+/* ── Main card ── */
+.pjd-card {
+    flex: 1;
+    min-width: 0;
+    background: #fff;
+    border-radius: 16px;
+    border: 1px solid #ececf5;
+    box-shadow: 0 2px 16px rgba(100, 80, 180, 0.07);
+    overflow: hidden;
+}
+
+/* Header */
+.pjd-header {
+    padding: 28px 32px 24px;
+}
+.pjd-eyebrow {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #7c5cbf;
+    margin-bottom: 8px;
+}
+.pjd-job-title {
+    font-family: 'Sora', sans-serif;
+    font-size: 26px;
+    font-weight: 700;
+    color: #1a1a2e;
+    margin: 0 0 14px;
+    line-height: 1.2;
+}
+.pjd-meta-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+.pjd-meta-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 13px;
+    font-weight: 500;
+    color: #555;
+}
+.pjd-meta-item svg { color: #7c5cbf; flex-shrink: 0; }
+
+/* Status pills */
+.pjd-status-pill {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    padding: 3px 10px;
+    border-radius: 20px;
+}
+.pjd-status-active { background: rgba(45, 122, 79, 0.10); color: #2d7a4f; }
+.pjd-status-closed { background: rgba(220, 53, 69, 0.08); color: #dc3545; }
+
+/* Divider */
+.pjd-divider {
+    height: 1px;
+    background: #f0f0f8;
+}
+
+/* Details grid */
+.pjd-details-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    padding: 20px 32px;
+    gap: 0;
+}
+.pjd-detail-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 8px 0;
+}
+.pjd-detail-label {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: #aaa;
+}
+.pjd-detail-value {
+    font-size: 14px;
+    font-weight: 500;
+    color: #2a2a4a;
+}
+
+/* Body */
+.pjd-body {
+    padding: 28px 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+}
+.pjd-section {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+.pjd-section-title {
+    font-family: 'Sora', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    color: #1a1a2e;
+    margin: 0;
+}
+.pjd-section-text {
+    font-size: 14px;
+    line-height: 1.8;
+    color: #4a4a6a;
+    margin: 0;
+    white-space: pre-line;
+}
+.pjd-section-list {
+    margin: 0;
+    padding-left: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+.pjd-section-list li {
+    font-size: 14px;
+    line-height: 1.7;
+    color: #4a4a6a;
+    padding-left: 4px;
+}
+.pjd-section-list li::marker { color: #7c5cbf; }
+
+/* Footer */
+.pjd-footer {
+    padding: 24px 32px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+.pjd-apply-btn {
+    padding: 13px 36px;
+    background: linear-gradient(135deg, #7c5cbf, #5c3fa3);
+    color: #fff;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    box-shadow: 0 4px 14px rgba(92, 63, 163, 0.30);
+    transition: opacity 0.2s, transform 0.15s;
+    letter-spacing: 0.02em;
+}
+.pjd-apply-btn:hover:not(:disabled) { opacity: 0.9; transform: translateY(-1px); }
+.pjd-apply-btn:disabled { background: #ccc; box-shadow: none; cursor: not-allowed; color: #888; }
+
+.pjd-closed-note {
+    font-size: 13px;
+    color: #dc3545;
+    font-weight: 500;
+}
+
+/* ── Right sidebar ── */
+.pjd-sidebar {
+    width: 268px;
+    flex-shrink: 0;
+    position: sticky;
+    top: 84px; /* accounts for topbar height */
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.pjd-sidebar-card {
+    background: #fff;
+    border-radius: 16px;
+    border: 1px solid #ececf5;
+    box-shadow: 0 2px 16px rgba(100, 80, 180, 0.07);
+    padding: 24px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+.pjd-sidebar-logo {
+    height: 36px;
+    width: auto;
+    object-fit: contain;
+    align-self: flex-start;
+    margin-bottom: 4px;
+}
+.pjd-sidebar-title {
+    font-family: 'Sora', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    color: #1a1a2e;
+    margin: 0;
+}
+.pjd-sidebar-sub {
+    font-size: 13px;
+    color: #666;
+    line-height: 1.6;
+    margin: 0;
+}
+.pjd-sidebar-deadline {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 12px;
+    font-weight: 500;
+    color: #888;
+    margin: 0;
+}
+.pjd-sidebar-deadline svg { color: #7c5cbf; flex-shrink: 0; }
+
+.pjd-sidebar-apply-btn {
+    width: 100%;
+    padding: 13px 16px;
+}
+
+/* Share card */
+.pjd-share-card {
+    background: #fff;
+    border-radius: 14px;
+    border: 1px solid #ececf5;
+    padding: 16px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+.pjd-share-label {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: #aaa;
+}
+.pjd-share-actions {
+    display: flex;
+    gap: 8px;
+}
+.pjd-share-btn {
+    flex: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 8px 10px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    color: #555;
+    background: #f4f4fb;
+    border: 1px solid #e4e4f0;
+    border-radius: 8px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background 0.2s, color 0.2s;
+}
+.pjd-share-btn:hover { background: #ebe8f8; color: #7c5cbf; border-color: #c9bde8; }
+
+/* ── Skeleton ── */
+.pjd-skeleton-logo,
+.pjd-skeleton-header,
+.pjd-skeleton-body {
+    background: linear-gradient(90deg, #e8e8f4 25%, #f0f0f8 50%, #e8e8f4 75%);
+    background-size: 200% 100%;
+    animation: pjd-shimmer 1.4s infinite;
+    border-radius: 16px;
+    margin-bottom: 20px;
+}
+.pjd-skeleton-logo   { height: 32px; width: 120px; border-radius: 8px; }
+.pjd-skeleton-header { height: 160px; }
+.pjd-skeleton-body   { height: 260px; }
+@keyframes pjd-shimmer {
+    0%   { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+/* ── Not found ── */
+.pjd-not-found {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    padding-top: 100px;
+    text-align: center;
+    color: #666;
+}
+.pjd-nf-icon {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    background: #ebebf8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #7c5cbf;
+    margin-bottom: 8px;
+}
+.pjd-not-found h2 {
+    font-family: 'Sora', sans-serif;
+    font-size: 20px;
+    color: #1a1a2e;
+    margin: 0;
+}
+.pjd-not-found p { font-size: 14px; margin: 0; }
+
+/* ── Responsive ── */
+@media (max-width: 900px) {
+    .pjd-sidebar { display: none; }
+}
+@media (max-width: 700px) {
+    .pjd-container { padding: 24px 16px 48px; }
+    .pjd-topbar-inner { padding: 0 20px; }
+    .pjd-header { padding: 22px 20px 18px; }
+    .pjd-details-grid { grid-template-columns: 1fr 1fr; padding: 16px 20px; }
+    .pjd-body { padding: 22px 20px; }
+    .pjd-footer { padding: 20px 20px; flex-direction: column; align-items: flex-start; }
+    .pjd-apply-btn { width: 100%; text-align: center; }
+    .pjd-job-title { font-size: 22px; }
+}

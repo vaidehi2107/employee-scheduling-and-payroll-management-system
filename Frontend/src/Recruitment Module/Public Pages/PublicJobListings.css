@@ -1,0 +1,170 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Sora:wght@600;700&display=swap');
+
+
+/* ── Topbar (shared with PublicJobDetail) ── */
+.pjd-topbar {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(255, 255, 255, 0.92);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-bottom: 1px solid #ececf5;
+}
+.pjd-topbar-inner {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 0 40px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.pjd-topbar-brand-wrap { display: flex; align-items: center; }
+.pjd-topbar-logo { height: 32px; width: auto; object-fit: contain; }
+.pjd-topbar-brand {
+    font-family: 'Sora', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    background: linear-gradient(135deg, #7c5cbf, #5c3fa3);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* ── Page ── */
+.pjl-page {
+    padding: 0 0 64px;
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    background: #f7f6fc;
+}
+
+/* ── Header ── */
+.pjl-header {
+    max-width: 720px;
+    margin: 0 auto 40px;
+    text-align: center;
+    padding-top: 48px;
+}
+.pjl-title {
+    font-family: 'Sora', sans-serif;
+    font-size: 34px;
+    font-weight: 700;
+    color: #1a1a2e;
+    letter-spacing: -0.02em;
+    margin-bottom: 8px;
+}
+.pjl-subtitle {
+    font-size: 15px;
+    color: #888;
+}
+
+/* ── Empty / loading / error states ── */
+.pjl-state {
+    max-width: 480px;
+    margin: 60px auto;
+    text-align: center;
+    font-size: 14px;
+    color: #888;
+}
+.pjl-state-error { color: #c0392b; }
+
+/* ── Grid ── */
+.pjl-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+    gap: 20px;
+    max-width: 1180px;
+    margin: 0 auto;
+}
+
+/* ── Card ── */
+.pjl-card {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 22px;
+    border: 1px solid #ececf5;
+    box-shadow: 0 2px 12px rgba(100,80,180,0.06);
+    transition: transform 0.2s, box-shadow 0.2s;
+    display: flex;
+    flex-direction: column;
+}
+.pjl-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 24px rgba(100,80,180,0.12);
+}
+
+.pjl-card-top { margin-bottom: 16px; }
+.pjl-job-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: #1a1a2e;
+    margin: 0 0 6px;
+}
+.pjl-dept {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: #aaa;
+}
+
+.pjl-divider { height: 1px; background: #f0f0f8; margin-bottom: 14px; }
+
+.pjl-details { display: flex; flex-direction: column; gap: 8px; flex: 1; }
+.pjl-detail-row { display: flex; justify-content: space-between; align-items: center; }
+.pjl-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: #aaa;
+}
+.pjl-value { font-size: 13px; font-weight: 500; color: #3a3a5c; }
+
+/* Card Footer */
+.pjl-card-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 18px;
+    padding-top: 14px;
+    border-top: 1px solid #f0f0f8;
+}
+.pjl-type-badge {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 20px;
+}
+
+.pjl-apply-btn {
+    border: none;
+    cursor: pointer;
+    padding: 9px 18px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    font-family: 'DM Sans', sans-serif;
+    color: #ffffff;
+    background: linear-gradient(135deg, #7c5cbf, #5c3fa3);
+    box-shadow: 0 4px 12px rgba(92,63,163,0.30);
+    transition: opacity 0.2s, transform 0.15s;
+}
+.pjl-apply-btn:hover { opacity: 0.9; transform: translateY(-1px); }
+.pjl-apply-btn:focus-visible {
+    outline: 2px solid #5c3fa3;
+    outline-offset: 2px;
+}
+
+/* ── Responsive ── */
+@media (max-width: 480px) {
+    .pjl-page { padding: 0 0 48px; }
+    .pjl-header { padding: 32px 18px 0; }
+    .pjl-grid { padding: 0 18px; }
+    .pjl-title { font-size: 26px; }
+    .pjd-topbar-inner { padding: 0 20px; }
+}

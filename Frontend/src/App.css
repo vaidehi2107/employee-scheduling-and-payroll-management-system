@@ -1,0 +1,21 @@
+/* Full viewport wrapper */
+.app-layout {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    overflow: hidden;
+}
+
+/* Row below topbar */
+.app-body {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+}
+
+/* Scrollable content area */
+.app-main {
+    flex: 1;
+    overflow-y: auto;
+    background-color: #eeeef8;
+}

@@ -1,0 +1,48 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap');
+
+/* ── Topbar shell ── */
+.topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 18px 32px;
+    background: #ffffff;
+    border-bottom: 1px solid #e8e8f0;
+    font-family: 'DM Sans', sans-serif;
+    flex-shrink: 0;
+}
+
+/* ── Left: title ── */
+.topbar-title {
+    font-size: 30px;
+    font-weight: 700;
+    color: #7c5cbf;
+    letter-spacing: 0.01em;
+    text-decoration: none;
+}
+
+/* ── Right: icons ── */
+.topbar-right {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.icon-btn {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    background: transparent;
+    color: #5a5a7a;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+}
+
+.icon-btn:hover {
+    background: rgba(124, 92, 191, 0.1);
+    color: #7c5cbf;
+}

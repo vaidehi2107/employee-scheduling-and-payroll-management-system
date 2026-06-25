@@ -1,0 +1,235 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Sora:wght@600;700&display=swap');
+
+/* ── Page ── */
+.jl-page {
+    padding: 36px 40px;
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100%;
+    background: #eeeef8;
+}
+
+/* ── Header ── */
+.jl-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-top: -15px;
+    margin-bottom: 36px;
+}
+.jl-title {
+    font-family: 'Sora', sans-serif;
+    font-size: 30px;
+    font-weight: 700;
+    color: #1a1a2e;
+    letter-spacing: -0.02em;
+    margin-bottom: 6px;
+}
+.jl-subtitle { font-size: 14px; color: #888; }
+
+.jl-add-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 22px;
+    background: linear-gradient(135deg, #7c5cbf, #5c3fa3);
+    color: white;
+    border-radius: 12px;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 600;
+    box-shadow: 0 4px 14px rgba(92,63,163,0.35);
+    transition: opacity 0.2s, transform 0.15s;
+    white-space: nowrap;
+}
+.jl-add-btn:hover { opacity: 0.9; transform: translateY(-1px); }
+
+/* ── Grid ── */
+.jl-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+    gap: 20px;
+}
+
+/* ── Card ── */
+.jl-card {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 20px;
+    border: 1px solid #ececf5;
+    box-shadow: 0 2px 12px rgba(100,80,180,0.06);
+    transition: transform 0.2s, box-shadow 0.2s;
+    display: flex;
+    flex-direction: column;
+}
+.jl-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 24px rgba(100,80,180,0.12);
+}
+
+.jl-card-top {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+.jl-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #7c5cbf, #5c3fa3);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+.jl-card-meta { flex: 1; min-width: 0; }
+.jl-job-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: #1a1a2e;
+    margin: 0 0 4px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.jl-dept {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: #aaa;
+}
+.jl-status-badge {
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 3px 8px;
+    border-radius: 20px;
+    flex-shrink: 0;
+    align-self: flex-start;
+}
+
+.jl-divider { height: 1px; background: #f0f0f8; margin-bottom: 14px; }
+
+.jl-details { display: flex; flex-direction: column; gap: 8px; flex: 1; }
+.jl-detail-row { display: flex; justify-content: space-between; align-items: center; }
+.jl-label { font-size: 11px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: #aaa; }
+.jl-value { font-size: 13px; font-weight: 500; color: #3a3a5c; }
+
+/* Card Footer */
+.jl-card-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 16px;
+    padding-top: 14px;
+    border-top: 1px solid #f0f0f8;
+}
+.jl-type-badge {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 20px;
+}
+.jl-card-actions { display: flex; gap: 6px; }
+
+.jl-action-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s, color 0.2s;
+}
+.jl-action-btn.view  { background: #eef4ff; color: #354056; }
+.jl-action-btn.view:hover  { background: #354056; color: white; }
+.jl-action-btn.edit  { background: #f0eef8; color: #7c5cbf; }
+.jl-action-btn.edit:hover  { background: #7c5cbf; color: white; }
+.jl-action-btn.delete { background: #fef0f0; color: #e05252; }
+.jl-action-btn.delete:hover { background: #e05252; color: white; }
+
+/* ── Quick Add ── */
+.jl-quick-add {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    border: 2px dashed #c8c4e8;
+    background: rgba(124,92,191,0.03);
+    color: #7c5cbf;
+    text-decoration: none;
+    cursor: pointer;
+    min-height: 180px;
+    transition: border-color 0.2s, background 0.2s, transform 0.2s;
+    box-shadow: none;
+}
+.jl-quick-add:hover { border-color: #7c5cbf; background: rgba(124,92,191,0.07); transform: translateY(-3px); }
+.jl-quick-title { font-size: 14px; font-weight: 700; color: #3a3a5c; margin: 0; }
+.jl-quick-sub { font-size: 12px; color: #aaa; margin: 0; }
+
+/* ── Toast ── */
+.jl-toast {
+    position: fixed;
+    bottom: 32px;
+    right: 32px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 20px;
+    border-radius: 12px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    color: #fff;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+    z-index: 9999;
+    animation: toastIn 0.3s cubic-bezier(0.34,1.56,0.64,1);
+}
+.jl-toast-success { background: linear-gradient(135deg, #7c5cbf, #5c3fa3); }
+.jl-toast-delete  { background: linear-gradient(135deg, #e05260, #c0392b); }
+@keyframes toastIn {
+    from { opacity: 0; transform: translateY(16px) scale(0.95); }
+    to   { opacity: 1; transform: translateY(0)   scale(1);     }
+}
+
+/* ── Delete confirm ── */
+.jl-confirm-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+.jl-confirm-dialog {
+    background: #fff;
+    border-radius: 10px;
+    padding: 28px 32px;
+    width: 320px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+    text-align: center;
+}
+.jl-confirm-dialog h4 { margin: 0 0 8px; font-size: 17px; color: #1a1a2e; font-family: 'Sora', sans-serif; }
+.jl-confirm-dialog p  { margin: 0 0 20px; font-size: 13px; color: #666; }
+.jl-confirm-actions   { display: flex; gap: 10px; justify-content: center; }
+.btn-confirm-delete {
+    background: #e53e3e; color: #fff; border: none; border-radius: 6px;
+    padding: 8px 22px; font-size: 14px; font-weight: 600;
+    font-family: 'DM Sans', sans-serif; cursor: pointer;
+}
+.btn-confirm-delete:hover { background: #c53030; }
+.btn-confirm-cancel {
+    background: #f1f1f1; color: #333; border: none; border-radius: 6px;
+    padding: 8px 22px; font-size: 14px; font-weight: 600;
+    font-family: 'DM Sans', sans-serif; cursor: pointer;
+}
+.btn-confirm-cancel:hover { background: #e2e2e2; }

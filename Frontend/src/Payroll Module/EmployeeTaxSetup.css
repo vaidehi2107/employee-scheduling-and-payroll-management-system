@@ -1,0 +1,539 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Sora:wght@600;700&display=swap');
+
+/* ── Page ── */
+.etax-container {
+    padding: 36px 40px;
+    background-color: #eeeef8;
+    min-height: 100%;
+    font-family: 'DM Sans', sans-serif;
+}
+
+/* ── Header ── */
+.etax-header {
+    margin-top: -15px;
+    margin-bottom: 32px;
+}
+
+.etax-title {
+    font-family: 'Sora', sans-serif;
+    font-size: 30px;
+    font-weight: 700;
+    color: #1a1a2e;
+    letter-spacing: -0.02em;
+    margin-bottom: 6px;
+}
+
+.etax-header p {
+    font-size: 14px;
+    color: #888;
+}
+
+/* ── Employee selector card ── */
+.etax-selector-card {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 22px 28px;
+    border: 1px solid #ececf5;
+    box-shadow: 0 2px 12px rgba(100, 80, 180, 0.06);
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.etax-selector-label {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #3a3a5c;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.etax-selector-label svg {
+    color: #7c5cbf;
+}
+
+.etax-select-wrapper {
+    position: relative;
+    flex: 1;
+    max-width: 360px;
+}
+
+.etax-employee-select {
+    width: 100%;
+    padding: 11px 38px 11px 14px;
+    border: 1.5px solid #e4e4f0;
+    border-radius: 10px;
+    font-size: 14px;
+    font-family: 'DM Sans', sans-serif;
+    color: #1a1a2e;
+    background: #f9f9fc;
+    outline: none;
+    appearance: none;
+    cursor: pointer;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.etax-employee-select:focus {
+    border-color: #7c5cbf;
+    box-shadow: 0 0 0 3px rgba(124, 92, 191, 0.1);
+    background: #fff;
+}
+
+.etax-select-arrow {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+    color: #888;
+}
+
+/* ── Section card ── */
+.etax-section {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 28px;
+    border: 1px solid #ececf5;
+    box-shadow: 0 2px 12px rgba(100, 80, 180, 0.06);
+}
+
+/* ── Section title row ── */
+.etax-section-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: 'Sora', sans-serif;
+    font-size: 16px;
+    font-weight: 600;
+    color: #1a1a2e;
+    margin-bottom: 20px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #f0f0f8;
+    flex-wrap: wrap;
+}
+
+.etax-section-title svg {
+    color: #7c5cbf;
+    flex-shrink: 0;
+}
+
+.etax-title-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-left: auto;
+}
+
+/* ── Mode badge ── */
+.etax-mode-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.etax-mode-badge.default {
+    background: rgba(100, 160, 100, 0.1);
+    color: #2d7a4f;
+    border: 1px solid rgba(45, 122, 79, 0.2);
+}
+
+.etax-mode-badge.customized {
+    background: rgba(124, 92, 191, 0.1);
+    color: #7c5cbf;
+    border: 1px solid rgba(124, 92, 191, 0.25);
+}
+
+/* ── Info banner ── */
+.etax-info-banner {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    background: rgba(100, 160, 100, 0.07);
+    border: 1px solid rgba(45, 122, 79, 0.2);
+    border-radius: 10px;
+    padding: 11px 16px;
+    font-size: 13px;
+    color: #2d6a45;
+    margin-bottom: 20px;
+}
+
+.etax-info-banner svg {
+    flex-shrink: 0;
+    color: #2d7a4f;
+}
+
+/* ── Reset to global button ── */
+.btn-reset-global {
+    padding: 7px 13px;
+    background: transparent;
+    color: #888;
+    border: 1.5px solid #e4e4f0;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s, border-color 0.2s;
+    white-space: nowrap;
+}
+
+.btn-reset-global:hover {
+    background: rgba(224, 92, 92, 0.06);
+    color: #e05c5c;
+    border-color: rgba(224, 92, 92, 0.3);
+}
+
+/* ── Add override / Customise button ── */
+.btn-add-override {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 14px;
+    background: rgba(124, 92, 191, 0.08);
+    color: #7c5cbf;
+    border: 1.5px solid #c8c4e8;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+    transition: background 0.2s, border-color 0.2s;
+    white-space: nowrap;
+}
+
+.btn-add-override:hover {
+    background: rgba(124, 92, 191, 0.15);
+    border-color: #7c5cbf;
+}
+
+/* ── Inline form ── */
+.etax-form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr auto;
+    gap: 14px;
+    align-items: flex-end;
+    background: #f5f4fc;
+    border: 1.5px dashed #c8c4e8;
+    border-radius: 12px;
+    padding: 18px 20px;
+    margin-bottom: 20px;
+}
+
+.etax-form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.etax-form-group label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #888;
+}
+
+.etax-form-group input,
+.etax-select-field {
+    padding: 11px 14px;
+    border: 1.5px solid #e4e4f0;
+    border-radius: 10px;
+    font-size: 14px;
+    font-family: 'DM Sans', sans-serif;
+    color: #1a1a2e;
+    background: #f9f9fc;
+    outline: none;
+    width: 100%;
+    transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+}
+
+.etax-form-group input:focus,
+.etax-select-field:focus {
+    border-color: #7c5cbf;
+    box-shadow: 0 0 0 3px rgba(124, 92, 191, 0.1);
+    background: #fff;
+}
+
+.etax-select-field {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    padding-right: 32px;
+}
+
+.etax-form-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.btn-etax-save {
+    padding: 10px 18px;
+    background: linear-gradient(135deg, #7c5cbf, #5c3fa3);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+    transition: opacity 0.2s, transform 0.15s;
+    box-shadow: 0 3px 10px rgba(92, 63, 163, 0.3);
+}
+
+.btn-etax-save:hover {
+    opacity: 0.88;
+    transform: translateY(-1px);
+}
+
+.btn-etax-cancel {
+    padding: 10px 18px;
+    background: transparent;
+    border: 1.5px solid #e4e4f0;
+    color: #888;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+}
+
+.btn-etax-cancel:hover {
+    background: rgba(0, 0, 0, 0.04);
+    color: #444;
+}
+
+/* ── Table ── */
+.etax-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+}
+
+.etax-table thead tr {
+    background: #f5f4fc;
+    border-radius: 8px;
+}
+
+.etax-table th {
+    padding: 11px 16px;
+    text-align: center;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: #888;
+}
+
+.etax-table th:first-child { border-radius: 8px 0 0 8px; }
+.etax-table th:last-child  { border-radius: 0 8px 8px 0; }
+
+.etax-table td {
+    padding: 13px 16px;
+    color: #1a1a2e;
+    border-bottom: 1px solid #f0f0f8;
+    text-align: center;
+}
+
+.etax-table tbody tr:last-child td { border-bottom: none; }
+.etax-table tbody tr:hover { background: #faf9ff; }
+
+.etax-row-editing td { background: #f5f4fc; }
+
+/* Read-only rows (global defaults) */
+.etax-row-readonly td {
+    color: #777;
+}
+
+.etax-readonly-label {
+    font-size: 11px;
+    color: #bbb;
+    font-style: italic;
+}
+
+/* ── Badges ── */
+.etax-badge {
+    display: inline-block;
+    padding: 3px 10px;
+    background: rgba(124, 92, 191, 0.1);
+    color: #7c5cbf;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.etax-status-badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: capitalize;
+}
+
+.etax-status-badge.active {
+    background: rgba(45, 122, 79, 0.1);
+    color: #2d7a4f;
+}
+
+.etax-status-badge.inactive {
+    background: rgba(220, 53, 69, 0.08);
+    color: #dc3545;
+}
+
+/* ── Row action buttons ── */
+.etax-actions-cell {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    justify-content: center;
+}
+
+.etax-icon-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.15s;
+    background: transparent;
+    padding: 0;
+}
+
+.etax-edit-btn { color: #7c5cbf; }
+.etax-edit-btn:hover {
+    background: rgba(124, 92, 191, 0.1);
+    transform: translateY(-1px);
+}
+
+.etax-delete-btn { color: #e05c5c; }
+.etax-delete-btn:hover {
+    background: rgba(224, 92, 92, 0.1);
+    transform: translateY(-1px);
+}
+
+/* ── Empty & placeholder states ── */
+.etax-empty,
+.etax-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    padding: 40px 32px;
+    color: #bbb;
+    font-size: 13px;
+    text-align: center;
+}
+
+.etax-placeholder {
+    background: #fff;
+    border-radius: 16px;
+    border: 1px solid #ececf5;
+    box-shadow: 0 2px 12px rgba(100, 80, 180, 0.06);
+}
+
+.confirm-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.confirm-dialog {
+    background: #fff;
+    border-radius: 10px;
+    padding: 28px 32px;
+    width: 320px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+    text-align: center;
+}
+
+.confirm-dialog h4 {
+    margin: 0 0 8px;
+    font-size: 17px;
+    color: #1a1a2e;
+}
+
+.confirm-dialog p {
+    margin: 0 0 20px;
+    font-size: 13px;
+    color: #666;
+}
+
+.confirm-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+}
+
+.btn-confirm-delete {
+    background: #e53e3e;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 8px 22px;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.btn-confirm-delete:hover { background: #c53030; }
+
+.btn-confirm-cancel {
+    background: #f1f1f1;
+    color: #333;
+    border: none;
+    border-radius: 6px;
+    padding: 8px 22px;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.btn-confirm-cancel:hover { background: #e2e2e2; }
+/* ── Overridden row highlight ── */
+.etax-row-overridden td {
+    background: rgba(124, 92, 191, 0.03);
+}
+
+/* ── "customised" badge inside Tax Code cell ── */
+.etax-override-badge {
+    display: inline-block;
+    margin-left: 7px;
+    padding: 2px 7px;
+    background: rgba(124, 92, 191, 0.12);
+    color: #7c5cbf;
+    border-radius: 20px;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    vertical-align: middle;
+}
+
+/* ── Placeholder span so delete column width stays stable ── */
+.etax-delete-placeholder {
+    display: inline-block;
+    width: 32px;
+    height: 32px;
+}
+
+/* ── Tax Code input read-only (locked when editing existing row) ── */
+.etax-form-group input[readonly] {
+    background: #f0f0f8;
+    color: #999;
+    cursor: not-allowed;
+}
