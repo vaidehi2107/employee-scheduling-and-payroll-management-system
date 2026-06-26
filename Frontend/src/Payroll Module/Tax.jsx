@@ -146,11 +146,11 @@ function Tax() {
                             <input name="taxCode" value={taxForm.taxCode} onChange={handleTaxChange} placeholder="e.g. TX01" />
                         </div>
                         <div className="tax-form-group">
-                            <label>Start Range ($)</label>
+                            <label>Start Range </label>
                             <input name="startRange" value={taxForm.startRange} onChange={handleTaxChange} placeholder="0" />
                         </div>
                         <div className="tax-form-group">
-                            <label>End Range ($)</label>
+                            <label>End Range </label>
                             <input name="endRange" value={taxForm.endRange} onChange={handleTaxChange} placeholder="0" />
                         </div>
                         <div className="tax-form-group">
@@ -200,7 +200,7 @@ function Tax() {
                             {taxes.map(tax => (
                                 <tr key={tax._id} className={editingTaxId === tax._id ? "tax-row-editing" : ""}>
                                     <td>{tax.taxCode}</td>
-                                    <td>${tax.startRange.toLocaleString()} – ${tax.endRange.toLocaleString()}</td>
+                                    <td>₹{(tax.startRange ?? 0).toLocaleString("en-IN")} – ₹{(tax.endRange ?? 0).toLocaleString("en-IN")}</td>
                                     <td><span className="tax-badge">{tax.employeePercentage}%</span></td>
                                     <td><span className="tax-badge">{tax.employerContribution}%</span></td>
                                     <td>

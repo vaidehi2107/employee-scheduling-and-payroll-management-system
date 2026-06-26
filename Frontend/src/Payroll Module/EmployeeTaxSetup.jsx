@@ -311,11 +311,11 @@ function EmployeeTaxSetup() {
                                 />
                             </div>
                             <div className="etax-form-group">
-                                <label>Start Range ($)</label>
+                                <label>Start Range </label>
                                 <input name="startRange" value={overrideForm.startRange} onChange={handleFormChange} placeholder="0" />
                             </div>
                             <div className="etax-form-group">
-                                <label>End Range ($)</label>
+                                <label>End Range </label>
                                 <input name="endRange" value={overrideForm.endRange} onChange={handleFormChange} placeholder="0" />
                             </div>
                             <div className="etax-form-group">
@@ -372,7 +372,7 @@ function EmployeeTaxSetup() {
                                                 <span className="etax-override-badge">customised</span>
                                             )}
                                         </td>
-                                        <td>${Number(tax.startRange).toLocaleString()} – ${Number(tax.endRange).toLocaleString()}</td>
+                                        <td>₹{Number(tax.startRange).toLocaleString()} – ₹{Number(tax.endRange).toLocaleString()}</td>
                                         <td><span className="etax-badge">{tax.employeePercentage}%</span></td>
                                         <td><span className="etax-badge">{tax.employerContribution}%</span></td>
                                         <td>

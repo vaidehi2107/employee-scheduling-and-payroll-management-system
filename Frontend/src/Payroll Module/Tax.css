@@ -14,8 +14,6 @@
     margin-bottom: 32px;
 }
 
-thead th:nth-child(2) { width: 150px; }  /* Range */
-
 .tax-title {
     font-family: 'Sora', sans-serif;
     font-size: 30px;
@@ -188,7 +186,11 @@ thead th:nth-child(2) { width: 150px; }  /* Range */
     width: 100%;
     border-collapse: collapse;
     font-size: 14px;
+    table-layout: fixed;
 }
+
+.tax-table th:nth-child(2),
+.tax-table td:nth-child(2) { width: 260px; }  /* Range */
 
 .tax-table thead tr {
     background: #f5f4fc;

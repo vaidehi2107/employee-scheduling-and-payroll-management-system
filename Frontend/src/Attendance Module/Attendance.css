@@ -14,7 +14,7 @@
     margin-bottom: 32px;
 }
 
-.emp-title {
+.attendance-title {
     font-family: 'Sora', sans-serif;
     font-size: 30px;
     font-weight: 700;
@@ -98,10 +98,6 @@
     background: #fff;
 }
 
-h3 {
-    margin-left: 20px;
-}
-
 /* ── Table container ── */
 .table-container {
     background: #ffffff;
@@ -149,7 +145,7 @@ tbody tr:hover {
 
 
 /* ── Add Attendance button ── */
-.add-emp-btn {
+.add-attendance-btn {
     display: inline-flex;
     align-items: center;
     gap: 8px;
@@ -167,13 +163,13 @@ tbody tr:hover {
     transition: opacity 0.2s, transform 0.15s;
 }
 
-.add-emp-btn:hover {
+.add-attendance-btn:hover {
     opacity: 0.9;
     transform: translateY(-1px);
 }
 
 /* ── Row action buttons ── */
-.emp-actions {
+.attendance-actions {
     display: flex;
     flex-direction: row;
     align-items: center;
@@ -182,7 +178,7 @@ tbody tr:hover {
     flex-wrap: nowrap;
 }
 
-.action-btn {
+.attendance-action-btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -194,28 +190,28 @@ tbody tr:hover {
     transition: background 0.2s, transform 0.15s;
 }
 
-.action-btn.edit {
+.attendance-action-btn.edit {
     background: rgba(124, 92, 191, 0.1);
     color: #7c5cbf;
 }
 
-.action-btn.edit:hover {
+.attendance-action-btn.edit:hover {
     background: rgba(124, 92, 191, 0.2);
     transform: translateY(-1px);
 }
 
-.action-btn.delete {
+.attendance-action-btn.delete {
     background: rgba(220, 53, 69, 0.08);
     color: #dc3545;
 }
 
-.action-btn.delete:hover {
+.attendance-action-btn.delete:hover {
     background: rgba(220, 53, 69, 0.16);
     transform: translateY(-1px);
 }
 
 /* ── Toast notification ── */
-.toast {
+.attendance-toast {
     position: fixed;
     bottom: 32px;
     right: 32px;
@@ -230,18 +226,18 @@ tbody tr:hover {
     color: #fff;
     box-shadow: 0 8px 24px rgba(0,0,0,0.15);
     z-index: 9999;
-    animation: toastIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    animation: attendanceToastIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-.toast-success {
+.attendance-toast-success {
     background: linear-gradient(135deg, #7c5cbf, #5c3fa3);
 }
 
-.toast-delete {
+.attendance-toast-delete {
     background: linear-gradient(135deg, #e05260, #c0392b);
 }
 
-@keyframes toastIn {
+@keyframes attendanceToastIn {
     from { opacity: 0; transform: translateY(16px) scale(0.95); }
     to   { opacity: 1; transform: translateY(0)   scale(1);     }
 }
@@ -375,4 +371,3 @@ tbody tr:hover {
     white-space: nowrap;
     line-height: 1;
 }
-

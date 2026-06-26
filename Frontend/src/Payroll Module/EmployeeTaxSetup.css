@@ -318,7 +318,11 @@
     width: 100%;
     border-collapse: collapse;
     font-size: 14px;
+    table-layout: fixed;
 }
+
+.etax-table th:nth-child(2),
+.etax-table td:nth-child(2) { width: 260px; }  /* Range */
 
 .etax-table thead tr {
     background: #f5f4fc;

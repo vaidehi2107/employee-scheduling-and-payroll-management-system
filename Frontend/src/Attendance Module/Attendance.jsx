@@ -151,7 +151,7 @@ function Attendance(){
       {/* HEADER */}
       <div className="attendance-header">
         <div>
-          <h2 className="emp-title">Attendance Management</h2>
+          <h2 className="attendance-title">Attendance Management</h2>
           <p>Track and monitor employee attendance</p>
         </div>
       </div>
@@ -182,7 +182,7 @@ function Attendance(){
           </select>
         </div>
 
-        <button className="add-emp-btn"
+        <button className="add-attendance-btn"
           onClick={() => { setSelectedAttendance(null); setShowForm(true); }}>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                 <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
@@ -251,7 +251,7 @@ function Attendance(){
                         </span>
                       </td>
                       <td>
-                        <div className="emp-actions">
+                        <div className="attendance-actions">
                           {item?.isLocked ? (
                             <span className="locked-badge">
                               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
@@ -262,7 +262,7 @@ function Attendance(){
                             </span>
                           ) : item ? (
                             <>
-                              <button className="action-btn edit"
+                              <button className="attendance-action-btn edit"
                                 onClick={() => { setSelectedAttendance(item); setShowForm(true); }}
                                 title="Edit">
                                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -270,7 +270,7 @@ function Attendance(){
                                       <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
                                   </svg>
                               </button>
-                              <button className="action-btn delete" onClick={() => setConfirmDeleteId(item._id)} title="Delete">
+                              <button className="attendance-action-btn delete" onClick={() => setConfirmDeleteId(item._id)} title="Delete">
                                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                                       <polyline points="3 6 5 6 21 6"/>
                                       <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
@@ -290,8 +290,6 @@ function Attendance(){
               </tbody>
             </table>
           </div>
-
-          
         </>
       )}
 
@@ -307,7 +305,7 @@ function Attendance(){
 
       {/* TOAST */}
       {toast && (
-        <div className={`toast toast-${toast.type}`}>
+        <div className={`attendance-toast attendance-toast-${toast.type}`}>
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
             {toast.type === "delete"
               ? <><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></>

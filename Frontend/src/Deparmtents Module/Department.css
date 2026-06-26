@@ -1,18 +1,18 @@
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Sora:wght@600;700&display=swap');
 
-.tax-container {
+.dept-container {
     padding: 36px 40px;
     background-color: #eeeef8;
     min-height: 100%;
     font-family: 'DM Sans', sans-serif;
 }
 
-.tax-header {
+.dept-header {
     margin-top: -15px;
     margin-bottom: 32px;
 }
 
-.tax-title {
+.dept-title {
     font-family: 'Sora', sans-serif;
     font-size: 30px;
     font-weight: 700;
@@ -21,12 +21,12 @@
     margin-bottom: 6px;
 }
 
-.tax-header p {
+.dept-header p {
     font-size: 14px;
     color: #888;
 }
 
-.tax-section {
+.dept-section {
     background: #ffffff;
     border-radius: 16px;
     padding: 28px;
@@ -34,7 +34,7 @@
     box-shadow: 0 2px 12px rgba(100, 80, 180, 0.06);
 }
 
-.tax-section-title {
+.dept-section-title {
     display: flex;
     align-items: center;
     gap: 10px;
@@ -47,12 +47,12 @@
     border-bottom: 1px solid #f0f0f8;
 }
 
-.tax-section-title svg {
+.dept-section-title svg {
     color: #7c5cbf;
     flex-shrink: 0;
 }
 
-.btn-add-tax {
+.btn-add-dept {
     display: flex;
     align-items: center;
     gap: 6px;
@@ -69,13 +69,13 @@
     transition: background 0.2s, border-color 0.2s;
 }
 
-.btn-add-tax:hover {
+.btn-add-dept:hover {
     background: rgba(124, 92, 191, 0.15);
     border-color: #7c5cbf;
 }
 
 /* Form row — 2 inputs + actions */
-.tax-form-row.dept-form-row {
+.dept-form-row {
     display: grid;
     grid-template-columns: 1.5fr 1fr auto;
     gap: 14px;
@@ -87,13 +87,13 @@
     margin-bottom: 20px;
 }
 
-.tax-form-group {
+.dept-form-group {
     display: flex;
     flex-direction: column;
     gap: 6px;
 }
 
-.tax-form-group label {
+.dept-form-group label {
     font-size: 11px;
     font-weight: 600;
     letter-spacing: 0.08em;
@@ -101,7 +101,7 @@
     color: #888;
 }
 
-.tax-form-group input {
+.dept-form-group input {
     padding: 11px 14px;
     border: 1.5px solid #e4e4f0;
     border-radius: 10px;
@@ -114,19 +114,19 @@
     transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
 }
 
-.tax-form-group input:focus {
+.dept-form-group input:focus {
     border-color: #7c5cbf;
     box-shadow: 0 0 0 3px rgba(124, 92, 191, 0.1);
     background: #fff;
 }
 
-.tax-form-actions {
+.dept-form-actions {
     display: flex;
     flex-direction: column;
     gap: 8px;
 }
 
-.btn-tax-save {
+.btn-dept-save {
     padding: 10px 18px;
     background: linear-gradient(135deg, #7c5cbf, #5c3fa3);
     color: white;
@@ -140,12 +140,12 @@
     box-shadow: 0 3px 10px rgba(92, 63, 163, 0.3);
 }
 
-.btn-tax-save:hover {
+.btn-dept-save:hover {
     opacity: 0.88;
     transform: translateY(-1px);
 }
 
-.btn-tax-cancel {
+.btn-dept-cancel {
     padding: 10px 18px;
     background: transparent;
     border: 1.5px solid #e4e4f0;
@@ -158,7 +158,7 @@
     transition: background 0.2s, color 0.2s;
 }
 
-.btn-tax-cancel:hover {
+.btn-dept-cancel:hover {
     background: rgba(0, 0, 0, 0.04);
     color: #444;
 }
@@ -233,17 +233,27 @@
 .dept-tag-chip span:hover { color: #e05c5c; }
 
 /* Table */
-.tax-table {
+.dept-table {
     width: 100%;
     border-collapse: collapse;
     font-size: 14px;
+    table-layout: fixed;
 }
 
-.tax-table thead tr {
+.dept-table th:nth-child(1),
+.dept-table td:nth-child(1) { width: 22%; }
+
+.dept-table th:nth-child(2),
+.dept-table td:nth-child(2) { width: 58%; }
+
+.dept-table th:nth-child(3),
+.dept-table td:nth-child(3) { width: 20%; }
+
+.dept-table thead tr {
     background: #f5f4fc;
 }
 
-.tax-table th {
+.dept-table th {
     padding: 11px 16px;
     text-align: center;
     font-size: 11px;
@@ -253,19 +263,19 @@
     color: #888;
 }
 
-.tax-table th:first-child { border-radius: 8px 0 0 8px; }
-.tax-table th:last-child  { border-radius: 0 8px 8px 0; }
+.dept-table th:first-child { border-radius: 8px 0 0 8px; }
+.dept-table th:last-child  { border-radius: 0 8px 8px 0; }
 
-.tax-table td {
+.dept-table td {
     padding: 13px 16px;
     color: #1a1a2e;
     border-bottom: 1px solid #f0f0f8;
     text-align: center;
 }
 
-.tax-table tbody tr:last-child td { border-bottom: none; }
-.tax-table tbody tr:hover { background: #faf9ff; }
-.tax-row-editing td { background: #f5f4fc; }
+.dept-table tbody tr:last-child td { border-bottom: none; }
+.dept-table tbody tr:hover { background: #faf9ff; }
+.dept-row-editing td { background: #f5f4fc; }
 
 /* Dept name + subtitle */
 .dept-name {
@@ -283,7 +293,14 @@
 }
 
 /* Job title badges */
-.tax-badge {
+.dept-badges-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    justify-content: center;
+}
+
+.dept-badge {
     display: inline-block;
     padding: 3px 10px;
     background: rgba(124, 92, 191, 0.1);
@@ -291,20 +308,20 @@
     border-radius: 20px;
     font-size: 12px;
     font-weight: 600;
-    margin: 2px;
+    white-space: nowrap;
 }
 
 .dept-empty-titles { color: #ccc; }
 
 /* Row actions */
-.tax-actions-cell {
+.dept-actions-cell {
     display: flex;
     gap: 8px;
     align-items: center;
     justify-content: center;
 }
 
-.tax-icon-btn {
+.dept-icon-btn {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -318,20 +335,20 @@
     padding: 0;
 }
 
-.tax-edit-btn { color: #7c5cbf; }
-.tax-edit-btn:hover {
+.dept-edit-btn { color: #7c5cbf; }
+.dept-edit-btn:hover {
     background: rgba(124, 92, 191, 0.1);
     transform: translateY(-1px);
 }
 
-.tax-delete-btn { color: #e05c5c; }
-.tax-delete-btn:hover {
+.dept-delete-btn { color: #e05c5c; }
+.dept-delete-btn:hover {
     background: rgba(224, 92, 92, 0.1);
     transform: translateY(-1px);
 }
 
 /* Empty state */
-.tax-empty {
+.dept-empty {
     display: flex;
     flex-direction: column;
     align-items: center;
