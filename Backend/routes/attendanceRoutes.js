@@ -6,98 +6,19 @@ import { verifyToken } from "../middleware.js";
 
 const router = express.Router();
 
-const timeToMinutes = (timeStr) => {
-      if (!timeStr || !timeStr.trim()) return null;
+//Payroll lock check
+const isLockedByPayroll = async (attendanceId) => {
+    const record = await Attendance.findById(attendanceId);
+    if(!record) return false;
 
-      const str = timeStr.trim().toUpperCase();
-      const match = str.match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/); // AM/PM now REQUIRED
-      if (!match) return null; // rejects "01:30" (no meridiem) safely
+    const payroll = await Payroll.findOne({
+        employeeId: record.employeeId,
+        periodStart: { $lte: record.date }, //periodstart ajni attendance date ya eni pelani hoy to lock
+        periodEnd: {$gte: record.date} //periodend ajni attendance date ya eni pachi ni hoy to lock
+    });
 
-      let hours = parseInt(match[1]);
-      const minutes = parseInt(match[2]);
-      const meridiem = match[3];
-
-      if (meridiem === "PM" && hours !== 12) hours += 12;
-      if (meridiem === "AM" && hours === 12) hours = 0;
-
-      return hours * 60 + minutes;
-    };
-
-    const getEffectiveWage = (wages = [], attendanceDate) => {
-      const date = new Date(attendanceDate);
-      const applicable = wages
-        .filter(w => w.effectiveDate && new Date(w.effectiveDate) <= date)
-        .sort((a, b) => new Date(b.effectiveDate) - new Date(a.effectiveDate));
-      return applicable[0] || null;
-    };
-
-    const calculateAttendanceValues = (
-        employee,
-        date,
-        inTime,
-        breakIn,
-        breakOut,
-        outTime
-        ) => {
-
-        const inTimeMinutes = timeToMinutes(inTime);
-        const outTimeMinutes = timeToMinutes(outTime);
-        const breakInMinutes = timeToMinutes(breakIn);
-        const breakOutMinutes = timeToMinutes(breakOut);
-
-        if (inTimeMinutes === null || outTimeMinutes === null) return { regularHours: 0, overtimeHours: 0, regEarnings: 0, otEarnings: 0, totalEarnings: 0 };
-
-        let totalMinutes = outTimeMinutes - inTimeMinutes;
-
-        if (breakInMinutes !== null && breakOutMinutes !== null) {
-            totalMinutes -= (breakOutMinutes - breakInMinutes);
-        }
-
-        if (totalMinutes <= 0) return { regularHours: 0, overtimeHours: 0, regEarnings: 0, otEarnings: 0, totalEarnings: 0 };
-
-        const totalHours = totalMinutes / 60;
-        let regularHours, overtimeHours;
-
-        if (totalHours <= 8) {
-            regularHours = totalHours.toFixed(2);
-            overtimeHours = 0;
-        } else {
-            regularHours = 8;
-            overtimeHours = (totalHours - 8).toFixed(2);
-        }
-
-        // Earnings
-        const wage = getEffectiveWage(employee.wages, date);
-        if (!wage) return { regularHours, overtimeHours, regEarnings: 0, otEarnings: 0, totalEarnings: 0 };
-
-        const hourlyRate   = parseFloat(wage.hourlyRate);
-        const otMultiplier = parseFloat(wage.otMultiplier);
-        const regEarnings   = (parseFloat(regularHours)  * hourlyRate).toFixed(2);
-        const otEarnings    = (parseFloat(overtimeHours) * hourlyRate * otMultiplier).toFixed(2);
-        const totalEarnings = (parseFloat(regEarnings) + parseFloat(otEarnings)).toFixed(2);
-
-        return {
-            regularHours: parseFloat(regularHours),
-            overtimeHours: parseFloat(overtimeHours),
-            regEarnings: parseFloat(regEarnings),
-            otEarnings: parseFloat(otEarnings),
-            totalEarnings: parseFloat(totalEarnings)
-        };
-    };
-
-    //Payroll lock check
-    const isLockedByPayroll = async (attendanceId) => {
-        const record = await Attendance.findById(attendanceId);
-        if(!record) return false;
-        
-        const payroll = await Payroll.findOne({
-            employeeId: record.employeeId,
-            periodStart: { $lte: record.date }, //periodstart ajni attendance date ya eni pelani hoy to lock
-            periodEnd: {$gte: record.date} //periodend ajni attendance date ya eni pachi ni hoy to lock
-        });
-
-        return !!payroll; //converts payroll into boolean - locked if true else false
-    };
+    return !!payroll; //converts payroll into boolean - locked if true else false
+};
 
 
 //Create Attendance
@@ -125,20 +46,10 @@ router.post("/attendance", verifyToken, async (req,res) => {
             });
         }
 
-        const calculated =
-            calculateAttendanceValues(
-                employee,
-                req.body.date,
-                req.body.inTime,
-                req.body.breakIn,
-                req.body.breakOut,
-                req.body.outTime
-            );
-            const attendance = new Attendance({
-                ...req.body,
-                ...calculated,
-                companyId: req.companyId
-            });
+        const attendance = new Attendance({
+            ...req.body,
+            companyId: req.companyId
+        });
         const savedAttendance = await attendance.save();
         res.status(201).json(savedAttendance);
    
@@ -169,10 +80,10 @@ router.get("/attendance/filter", verifyToken, async (req,res) => {
             filter.employeeId = employeeId;
         }
 
-        const attendance = await Attendance.find(filter).populate("employeeId", "firstName lastName wages");
-        //populate - search for employeeid and returns firstname and lastname and wages - similar to joins in sql
+        const attendance = await Attendance.find(filter).populate("employeeId", "firstName lastName");
+        //populate - search for employeeid and returns firstname and lastname - similar to joins in sql
 
-        //Attache islocked to every record
+        //Attach islocked to every record
         const lockedAttendance = await Promise.all(
             attendance.map(async (record) => {
                 const payroll = await Payroll.findOne({
@@ -236,21 +147,9 @@ router.put("/attendance/update/:id", verifyToken, async (req,res) => {
             });
         }
         
-        const calculated =
-            calculateAttendanceValues(
-                employee,
-                req.body.date,
-                req.body.inTime,
-                req.body.breakIn,
-                req.body.breakOut,
-                req.body.outTime
-            );
-            const updatedAttendance =await Attendance.findByIdAndUpdate(
+        const updatedAttendance = await Attendance.findByIdAndUpdate(
                 id,
-                {
-                    ...req.body,
-                    ...calculated
-                },
+                { ...req.body },
                 { new: true }
             );
         res.json(updatedAttendance);

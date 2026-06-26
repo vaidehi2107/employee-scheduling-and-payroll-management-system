@@ -23,12 +23,12 @@ const attendanceSchema = new mongoose.Schema({
     breakOut: String,
     outTime: String,
 
-    regularHours: Number,
-    overtimeHours: Number,
+    // regularHours: Number,
+    // overtimeHours: Number,
 
-    regEarnings: Number,
-    otEarnings: Number,
-    totalEarnings: Number
+    // regEarnings: Number,
+    // otEarnings: Number,
+    // totalEarnings: Number
 
 });
 

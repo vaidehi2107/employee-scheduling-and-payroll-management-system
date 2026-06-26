@@ -98,24 +98,8 @@
     background: #fff;
 }
 
-/* ── Search button ── */
-.search-btn {
-    padding: 11px 24px;
-    background: linear-gradient(135deg, #7c5cbf, #5c3fa3);
-    color: white;
-    border: none;
-    border-radius: 10px;
-    font-size: 14px;
-    font-weight: 600;
-    font-family: 'DM Sans', sans-serif;
-    cursor: pointer;
-    box-shadow: 0 4px 14px rgba(92, 63, 163, 0.3);
-    transition: opacity 0.2s, transform 0.15s;
-}
-
-.search-btn:hover {
-    opacity: 0.9;
-    transform: translateY(-1px);
+h3 {
+    margin-left: 20px;
 }
 
 /* ── Table container ── */
@@ -133,11 +117,6 @@ table {
     table-layout: fixed;
 }
 
-thead th:nth-child(1) { width: 125px; }
-thead th:nth-child(2) { width: 60px; } /* Date */
-/* add this after thead th:nth-child(2) */
-thead th:last-child { width: 85px; }
-
 
 thead {
     background: #f9f9fc;
@@ -146,7 +125,7 @@ thead {
 }
 
 thead th {
-    padding: 14px 18px;
+    padding: 26px 18px;
     text-align: left;
     font-size: 11px;
     font-weight: 700;
@@ -157,7 +136,7 @@ thead th {
 }
 
 tbody td {
-    padding: 16px 18px;
+    padding: 21px 18px;
     border-top: 1px solid #f0f0f8;
     font-size: 14px;
     color: #3a3a5c;
@@ -168,9 +147,7 @@ tbody tr:hover {
     background: rgba(124, 92, 191, 0.04);
 }
 
-.break-header {
-    text-align: center;
-}
+
 /* ── Add Attendance button ── */
 .add-emp-btn {
     display: inline-flex;
@@ -198,8 +175,11 @@ tbody tr:hover {
 /* ── Row action buttons ── */
 .emp-actions {
     display: flex;
-    gap: 8px;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
     justify-content: center;
+    flex-wrap: nowrap;
 }
 
 .action-btn {
@@ -266,14 +246,133 @@ tbody tr:hover {
     to   { opacity: 1; transform: translateY(0)   scale(1);     }
 }
 
-/* ── Earnings cells ── */
-.earnings-cell {
-    color: #2d7a4f;
+/* ── Empty state prompt (no employee selected) ── */
+.empty-prompt {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    padding: 64px 24px;
+    color: #9a97b8;
+    font-size: 14px;
+    background: #ffffff;
+    border-radius: 16px;
+    border: 1px solid #ececf5;
+    box-shadow: 0 2px 12px rgba(100, 80, 180, 0.06);
+}
+
+/* ── Month view header ── */
+.month-view-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+}
+
+.month-view-header h3 {
+    font-family: 'Sora', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    color: #7c5cbf;
+}
+
+.month-view-header span {
+    font-size: 13px;
+    color: #888;
+}
+
+.month-view-stats {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-left: auto;
+    font-size: 13px;
     font-weight: 600;
 }
 
-.total-cell {
-    color: #1a1a2e;
+.month-view-stats .stat-pill {
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
     font-weight: 700;
-    background: rgba(124, 92, 191, 0.05);
 }
+
+.month-view-stats .stat-pill.total {
+    background: rgba(124, 92, 191, 0.08);
+    color: #7c5cbf;
+}
+
+.month-view-stats .stat-pill.present {
+    background: rgba(45, 122, 79, 0.1);
+    color: #2d7a4f;
+}
+
+.month-view-stats .stat-pill.absent {
+    background: rgba(220, 53, 69, 0.08);
+    color: #dc3545;
+}
+
+/* ── Status badges ── */
+.status-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+}
+
+.status-present {
+    background: rgba(45, 122, 79, 0.1);
+    color: #2d7a4f;
+}
+
+.status-absent {
+    background: rgba(220, 53, 69, 0.08);
+    color: #dc3545;
+}
+
+.status-weekend {
+    background: rgba(0, 0, 0, 0.05);
+    color: #999;
+}
+
+.status-upcoming {
+    background: rgba(124, 92, 191, 0.08);
+    color: #9a8cc7;
+}
+
+/* ── Weekend / upcoming rows ── */
+.row-weekend {
+    background: #fafafd;
+}
+
+.row-weekend td {
+    color: #b4b4c4;
+}
+
+.row-upcoming td {
+    color: #c4c2d6;
+}
+
+.no-action-dash {
+    color: #ccc;
+}
+
+/* ── Locked badge ── */
+.locked-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: rgba(124, 92, 191, 0.1);
+    color: #7c5cbf;
+    padding: 5px 8px;
+    border-radius: 8px;
+    font-size: 11px;
+    font-weight: 600;
+    white-space: nowrap;
+    line-height: 1;
+}
+

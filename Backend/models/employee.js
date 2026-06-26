@@ -38,13 +38,13 @@ const employeeSchema = new mongoose.Schema({
         zipCode: Number
     },
 
-    wages: [
-        {
-            effectiveDate: Date,
-            hourlyRate: Number,
-            otMultiplier: Number
-        }
-    ],
+    // wages: [
+    //     {
+    //         effectiveDate: Date,
+    //         hourlyRate: Number,
+    //         otMultiplier: Number
+    //     }
+    // ],
 
     companyId: {
         type: mongoose.Schema.Types.ObjectId,

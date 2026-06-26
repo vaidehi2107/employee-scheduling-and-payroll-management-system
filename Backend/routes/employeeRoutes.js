@@ -60,62 +60,62 @@ const router = express.Router();
 
 
     //Add wage route
-    router.post("/emp/:id/wages", verifyToken, async (req,res) => {
-        try {
-            const { id } = req.params;
-            const newWage = req.body;
-            const employee = await Employee.findByIdAndUpdate(
-                id,
-                {
-                    $push: {wages: newWage}
-                },
-                {new: true}
-            );
-            res.json(employee);
-        } catch (err) {
-            res.status(500).json({message: err.message});
-        }
-    });
+    // router.post("/emp/:id/wages", verifyToken, async (req,res) => {
+    //     try {
+    //         const { id } = req.params;
+    //         const newWage = req.body;
+    //         const employee = await Employee.findByIdAndUpdate(
+    //             id,
+    //             {
+    //                 $push: {wages: newWage}
+    //             },
+    //             {new: true}
+    //         );
+    //         res.json(employee);
+    //     } catch (err) {
+    //         res.status(500).json({message: err.message});
+    //     }
+    // });
 
     //update wage
-    router.put("/emp/:id/wages/:wageId", verifyToken, async (req,res) => {
-        try{
-            const { id, wageId } = req.params;
-            const updatedEmployee = await Employee.findOneAndUpdate(
-                { _id: id, "wages._id": wageId},
-                {
-                    $set:{
-                        "wages.$.effectiveDate": req.body.effectiveDate,
-                        "wages.$.hourlyRate": req.body.hourlyRate,
-                        "wages.$.otMultiplier": req.body.otMultiplier
-                    }
-                },
-                {new: true}
-            );
-            res.json(updatedEmployee);
-          } catch(err){
-            res.status(500).json({message: err.message});
-          }
-    });
+    // router.put("/emp/:id/wages/:wageId", verifyToken, async (req,res) => {
+    //     try{
+    //         const { id, wageId } = req.params;
+    //         const updatedEmployee = await Employee.findOneAndUpdate(
+    //             { _id: id, "wages._id": wageId},
+    //             {
+    //                 $set:{
+    //                     "wages.$.effectiveDate": req.body.effectiveDate,
+    //                     "wages.$.hourlyRate": req.body.hourlyRate,
+    //                     "wages.$.otMultiplier": req.body.otMultiplier
+    //                 }
+    //             },
+    //             {new: true}
+    //         );
+    //         res.json(updatedEmployee);
+    //       } catch(err){
+    //         res.status(500).json({message: err.message});
+    //       }
+    // });
 
 
     //delete wage
-    router.delete("/emp/:id/wages/:wageId", verifyToken, async (req,res) => {
-        try{
-        const { id, wageId } = req.params;
-        const updatedEmployee = await Employee.findByIdAndUpdate(
-            id,
-            {
-                $pull: {
-                    wages: {_id: wageId}
-                }
-            },
-            {new: true}
-        );
-        res.json(updatedEmployee);
-        } catch(err) {
-            res.status(500).json({message: req.message});
-        }
-    });
+    // router.delete("/emp/:id/wages/:wageId", verifyToken, async (req,res) => {
+    //     try{
+    //     const { id, wageId } = req.params;
+    //     const updatedEmployee = await Employee.findByIdAndUpdate(
+    //         id,
+    //         {
+    //             $pull: {
+    //                 wages: {_id: wageId}
+    //             }
+    //         },
+    //         {new: true}
+    //     );
+    //     res.json(updatedEmployee);
+    //     } catch(err) {
+    //         res.status(500).json({message: req.message});
+    //     }
+    // });
 
 export default router;

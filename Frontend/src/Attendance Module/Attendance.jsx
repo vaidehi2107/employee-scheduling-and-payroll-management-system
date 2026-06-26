@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import API from "../api.js";
 import DatePicker from "react-datepicker";
 import "./Attendance.css";
@@ -19,30 +19,30 @@ const formatTime = (val) => {
   return String(hour).padStart(2, "0") + ":" + String(m).padStart(2, "0") + " " + meridiem;
 };
 
+const isSameDay = (a, b) =>
+  a.getFullYear() === b.getFullYear() &&
+  a.getMonth() === b.getMonth() &&
+  a.getDate() === b.getDate();
+
+// First and last day of the month containing `monthDate`
+const getMonthRange = (monthDate) => {
+  const start = new Date(monthDate.getFullYear(), monthDate.getMonth(), 1);
+  const end = new Date(monthDate.getFullYear(), monthDate.getMonth() + 1, 0);
+  end.setHours(23, 59, 59, 999);
+  return { start, end };
+};
+
 function Attendance(){
 
     const [employees, setEmployees] = useState([]);
     const [attendance, setAttendance] = useState([]);
 
-    const getMonday = (date) => {
-        const d = new Date(date);
-        const day = d.getDay();
-        const diff = day === 0 ? -6 : 1-day;
-        d.setDate(d.getDate()+ diff);
-        d.setHours(0, 0, 0, 0);
-        return d;
-    };
-
-    const [filters, setFilters] = useState({
-        startDate: getMonday(new Date()),
-        endDate: new Date(),
-        employeeId: ""
-    });
+    const [employeeId, setEmployeeId] = useState("");
+    const [selectedMonth, setSelectedMonth] = useState(new Date());
 
     const [showForm, setShowForm] = useState(false);
     const [selectedAttendance, setSelectedAttendance] = useState(null);
     const [toast, setToast] = useState(null);
-    const [recalculating, setRecalculating] = useState(false);
 
     const [confirmDeleteId, setConfirmDeleteId] = useState(null);
 
@@ -53,7 +53,6 @@ function Attendance(){
 
     useEffect(() => {
         fetchEmployees();
-        searchAttendance(getMonday(new Date()), new Date(), "");
     }, []);
 
     const fetchEmployees = async () => {
@@ -65,24 +64,33 @@ function Attendance(){
         }
     };
 
-    const handleChange = (e) => {
-        setFilters({ ...filters, [e.target.name]: e.target.value });
-    };
+    // Load attendance whenever the selected employee or month changes
+    useEffect(() => {
+        if (!employeeId) {
+            setAttendance([]);
+            return;
+        }
+        const { start, end } = getMonthRange(selectedMonth);
+        searchAttendance(start, end, employeeId);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [employeeId, selectedMonth]);
 
-    const searchAttendance = async (
-        startDate = filters.startDate,
-        endDate = filters.endDate,
-        employeeId = filters.employeeId
-    ) => {
+    const searchAttendance = async (startDate, endDate, empId) => {
         try {
             const response = await API.get(
                 "/attendance/filter",
-                { params: { employeeId, startDate, endDate } }
+                { params: { employeeId: empId, startDate: startDate.toISOString(), endDate: endDate.toISOString() } }
             );
             setAttendance(response.data);
         } catch (err) {
             console.log(err);
         }
+    };
+
+    const refreshAttendance = () => {
+        if (!employeeId) return;
+        const { start, end } = getMonthRange(selectedMonth);
+        searchAttendance(start, end, employeeId);
     };
 
     const handleDelete = async (id) => {
@@ -96,41 +104,46 @@ function Attendance(){
         }
     };
 
-    // Returns the wage effective on a given date
-    const getEffectiveWage = (wages = [], attendanceDate) => {
-        const date = new Date(attendanceDate);
-        const applicable = wages
-            .filter(w => w.effectiveDate && new Date(w.effectiveDate) <= date)
-            .sort((a, b) => new Date(b.effectiveDate) - new Date(a.effectiveDate));
-        return applicable[0] || null;
-    };
+    const selectedEmployee = employees.find(emp => emp._id === employeeId);
 
-    // Re-submit all stale records (zero earnings but has times) to backend for recalculation
-    const handleRecalculateAll = async () => {
-        const stale = attendance.filter(item => item.totalEarnings === 0 && item.inTime && item.outTime);
-        if (stale.length === 0) return showToast("No records need recalculation.");
-        setRecalculating(true);
-        try {
-            await Promise.all(stale.map(item =>
-                API.put(`/attendance/update/${item._id}`, {
-                    employeeId: item.employeeId?._id || item.employeeId,
-                    date: item.date,
-                    inTime: item.inTime,
-                    breakIn: item.breakIn,
-                    breakOut: item.breakOut,
-                    outTime: item.outTime,
-                })
-            ));
-            await searchAttendance();
-            showToast(`${stale.length} record(s) recalculated successfully!`);
-        } catch (err) {
-            console.log(err);
-        } finally {
-            setRecalculating(false);
+    // Today, stripped to midnight, for past/future comparisons
+    const today = useMemo(() => {
+        const d = new Date();
+        d.setHours(0, 0, 0, 0);
+        return d;
+    }, []);
+
+    // Build every calendar day of the selected month, merged with whatever
+    // attendance records exist. Weekends are treated as days off, and days
+    // after today are "upcoming" (no status yet).
+    const calendarDays = useMemo(() => {
+        if (!employeeId) return [];
+        const { start, end } = getMonthRange(selectedMonth);
+        const days = [];
+
+        for (let cursor = new Date(start); cursor <= end; cursor.setDate(cursor.getDate() + 1)) {
+            const dayDate = new Date(cursor);
+            const dow = dayDate.getDay();
+            const isWeekend = dow === 0 || dow === 6;
+            const isFuture = dayDate > today;
+            const record = attendance.find(item => isSameDay(new Date(item.date), dayDate));
+
+            let status;
+            if (isWeekend) status = "weekend";
+            else if (isFuture) status = "upcoming";
+            else if (record) status = "present";
+            else status = "absent";
+
+            days.push({ date: dayDate, isWeekend, isFuture, record, status });
         }
-    };
+        return days;
+    }, [attendance, selectedMonth, employeeId, today]);
 
-    const staleCount = attendance.filter(item => item.totalEarnings === 0 && item.inTime && item.outTime).length;
+    const workingDays = calendarDays.filter(d => d.status === "present" || d.status === "absent");
+    const presentCount = calendarDays.filter(d => d.status === "present").length;
+    const absentCount = workingDays.length - presentCount;
+
+    const statusLabel = { present: "Present", absent: "Absent", weekend: "Week Off", upcoming: "Upcoming" };
 
     return(
      <div className="attendance-container">
@@ -147,24 +160,19 @@ function Attendance(){
       <div className="filter-section">
 
         <div className="filter-group">
-          <label>Date Range</label>
+          <label>Month</label>
           <DatePicker
-            selectsRange
-            startDate={filters.startDate}
-            endDate={filters.endDate}
-            onChange={([start, end]) =>
-              setFilters({ ...filters, startDate: start, endDate: end })
-            }
-            dateFormat="MM-dd-yyyy"
-            placeholderText="Select date range"
+            selected={selectedMonth}
+            onChange={(date) => setSelectedMonth(date)}
+            dateFormat="MMMM yyyy"
+            showMonthYearPicker
             className="date-picker"
-            monthsShown={2}
           />
         </div>
 
         <div className="filter-group">
           <label>Employee</label>
-          <select name="employeeId" value={filters.employeeId} onChange={handleChange}>
+          <select name="employeeId" value={employeeId} onChange={(e) => setEmployeeId(e.target.value)}>
             <option value="">Select Employee</option>
             {employees.map((emp) => (
               <option key={emp._id} value={emp._id}>
@@ -173,13 +181,6 @@ function Attendance(){
             ))}
           </select>
         </div>
-
-        <button
-          className="search-btn"
-          onClick={() => searchAttendance(filters.startDate, filters.endDate, filters.employeeId)}
-        >
-          Search
-        </button>
 
         <button className="add-emp-btn"
           onClick={() => { setSelectedAttendance(null); setShowForm(true); }}>
@@ -193,110 +194,112 @@ function Attendance(){
         </button>
       </div>
 
-      {/* TABLE */}
-      <div className="table-container">
-        <table>
-          <thead>
-            <tr>
-              <th rowSpan="2">Employee</th>
-              <th rowSpan="2">Date</th>
-              <th rowSpan="2">In Time</th>
-              <th colSpan="2" className="break-header">Break</th>
-              <th rowSpan="2">Out Time</th>
-              <th rowSpan="2">Regular Hrs</th>
-              <th rowSpan="2">OverTime Hrs</th>
-              <th rowSpan="2">Reg Earnings</th>
-              <th rowSpan="2">OT Earnings</th>
-              <th rowSpan="2">Total Earnings</th>
-            </tr>
-            <tr>
-              <th>Break In</th>
-              <th>Break Out</th>
-            </tr>
-          </thead>
+      {!employeeId ? (
+        <div className="empty-prompt">
+          <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#c8c4e8" strokeWidth="1.5">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+            <circle cx="9" cy="7" r="4"/>
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+            <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+          </svg>
+          <p>Select an employee to view their monthly attendance calendar.</p>
+        </div>
+      ) : (
+        <>
+          <div className="month-view-header">
+            <h3>{selectedEmployee ? `${selectedEmployee.firstName} ${selectedEmployee.lastName}` : ""}</h3>
+            <span>{format(selectedMonth, "MMMM yyyy")}</span>
+            <div className="month-view-stats">
+              <span className="stat-pill total">{workingDays.length} Working Days</span>
+              <span className="stat-pill present">{presentCount} Present</span>
+              <span className="stat-pill absent">{absentCount} Absent</span>
+            </div>
+          </div>
 
-          <tbody>
-            {attendance?.map((item) => {
-              const wage = getEffectiveWage(item.employeeId?.wages, item.date);
-              return (
-                <tr key={item._id}>
-                  <td>
-                    {item.employeeId?.firstName}{" "}{item.employeeId?.lastName}
-                    {wage && (
-                      <div style={{ fontSize: "0.65rem", color: "#6b7280", marginTop: "2px" }}>
-                        (${parseFloat(wage.hourlyRate)} /hr)
-                      </div>
-                    )}
-                  </td>
-
-                  <td>{format(new Date(item.date), "MM-dd-yyyy")}</td>
-                  <td>{formatTime(item.inTime)}</td>
-                  <td>{formatTime(item.breakIn)}</td>
-                  <td>{formatTime(item.breakOut)}</td>
-                  <td>{formatTime(item.outTime)}</td>
-                  <td>{item.regularHours != null ? `${item.regularHours} hrs` : "—"}</td>
-                  <td>{item.overtimeHours != null ? `${item.overtimeHours} hrs` : "—"}</td>
-                  <td className={item.regEarnings ? "earnings-cell" : ""}>{item.regEarnings != null ? `$${item.regEarnings.toFixed(2)}` : "—"}</td>
-                  <td className={item.otEarnings ? "earnings-cell" : ""}>{item.otEarnings != null ? `$${item.otEarnings.toFixed(2)}` : "—"}</td>
-                  <td className={item.totalEarnings ? "earnings-cell total-cell" : ""}>{item.totalEarnings != null ? `$${item.totalEarnings.toFixed(2)}` : "—"}</td>
-
-                  <td>
-                    <div className="emp-actions">
-                      {item.isLocked ? (
-                        <span style={{
-                          display: "inline-flex",
-                          alignItems: "center",
-                          gap: "4px",
-                          background: "rgba(124, 92, 191, 0.1)",
-                          color: "#7c5cbf",
-                          padding: "5px 8px",
-                          borderRadius: "8px",
-                          fontSize: "11px",
-                          fontWeight: 600,
-                          whiteSpace: "nowrap",
-                          lineHeight: 1
-                        }}>
-                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
-                            <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
-                          </svg>
-                          Locked
-                        </span>
-                      ) : (
-            
-                        <>
-                          <button className="action-btn edit"
-                            onClick={() => { setSelectedAttendance(item); setShowForm(true); }}
-                            title="Edit">
-                              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
-                                  <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
-                              </svg>
-                          </button>
-                          <button className="action-btn delete" onClick={() => setConfirmDeleteId(item._id)} title="Delete">
-                              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                  <polyline points="3 6 5 6 21 6"/>
-                                  <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
-                                  <path d="M10 11v6M14 11v6"/>
-                                  <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
-                              </svg>
-                          </button>
-                        </>
-                      )}
-                    </div>
-                  </td>
+          {/* TABLE */}
+          <div className="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th rowSpan="2">Date</th>
+                  <th rowSpan="2">In Time</th>
+                  <th rowspan="2">Break In</th>
+                  <th rowspan="2">Break Out</th>
+                  <th rowSpan="2">Out Time</th>
+                  <th rowSpan="2">Status</th>
+                  <th rowSpan="2">Actions</th>
                 </tr>
-              );
-            })}
-          </tbody>
-        </table>
-      </div>
+              </thead>
+
+              <tbody>
+                {calendarDays.map((day) => {
+                  const item = day.record;
+                  const rowClass =
+                    day.status === "weekend" ? "row-weekend" :
+                    day.status === "upcoming" ? "row-upcoming" : "";
+
+                  return (
+                    <tr key={day.date.toISOString()} className={rowClass}>
+                      <td>{format(day.date, "MM-dd-yyyy")}</td>
+                      <td>{item ? formatTime(item.inTime) : "—"}</td>
+                      <td>{item ? formatTime(item.breakIn) : "—"}</td>
+                      <td>{item ? formatTime(item.breakOut) : "—"}</td>
+                      <td>{item ? formatTime(item.outTime) : "—"}</td>
+                      <td>
+                        <span className={`status-badge status-${day.status}`}>
+                          {statusLabel[day.status]}
+                        </span>
+                      </td>
+                      <td>
+                        <div className="emp-actions">
+                          {item?.isLocked ? (
+                            <span className="locked-badge">
+                              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                                <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                              </svg>
+                              Locked
+                            </span>
+                          ) : item ? (
+                            <>
+                              <button className="action-btn edit"
+                                onClick={() => { setSelectedAttendance(item); setShowForm(true); }}
+                                title="Edit">
+                                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                      <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                                      <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                                  </svg>
+                              </button>
+                              <button className="action-btn delete" onClick={() => setConfirmDeleteId(item._id)} title="Delete">
+                                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                      <polyline points="3 6 5 6 21 6"/>
+                                      <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+                                      <path d="M10 11v6M14 11v6"/>
+                                      <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
+                                  </svg>
+                              </button>
+                            </>
+                          ) : (
+                            <span className="no-action-dash">—</span>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+
+          
+        </>
+      )}
 
       <AttendanceForm
         isOpen={showForm}
         onClose={() => setShowForm(false)}
         onSuccess={(isEdit) => {
-          searchAttendance();
+          refreshAttendance();
           showToast(isEdit ? "Attendance updated successfully!" : "Attendance added successfully!");
         }}
         selectedAttendance={selectedAttendance}
