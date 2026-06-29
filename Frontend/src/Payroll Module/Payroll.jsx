@@ -12,8 +12,7 @@ const [employees, setEmployees] = useState([]);
 const [payrolls, setPayrolls] = useState([]);
 const [form, setForm] = useState({
     employeeId: "",
-    periodStart: null,
-    periodEnd: null
+    period: null // Date representing the selected pay month/year
 });
 
 const [generating, setGenerating] = useState(false);
@@ -52,20 +51,23 @@ const fetchPayrolls = async() => {
 
 //handle generate
 const handleGenerate = async() => {
-     if (!form.employeeId || !form.periodStart || !form.periodEnd)
+     if (!form.employeeId || !form.period)
             return showToast("Please fill all fields.", "error");
- 
+
     setGenerating(true);
     try{
 
+        const month = form.period.getMonth() + 1;
+        const year = form.period.getFullYear();
+
         const res = await API.post("/payroll/generate", {
             employeeId: form.employeeId,
-            periodStart: form.periodStart,
-            periodEnd: form.periodEnd
+            month,
+            year
         });
         
         await fetchPayrolls();
-        setForm({employeeId: "", periodStart: null, periodEnd: null});
+        setForm({employeeId: "", period: null});
         showToast("Payroll generated successfully!");
 
     }catch(err){
@@ -134,20 +136,16 @@ const handleView = async(id) => {
                         </select>
                     </div>
  
-                    {/* Date Range */}
+                    {/* Pay Month */}
                     <div className="payroll-filter-group">
-                        <label>Pay Period</label>
+                        <label>Pay Month</label>
                         <DatePicker
-                            selectsRange
-                            startDate={form.periodStart}
-                            endDate={form.periodEnd}
-                            onChange={([start, end]) =>
-                                setForm({ ...form, periodStart: start, periodEnd: end })
-                            }
-                            dateFormat="MM-dd-yyyy"
-                            placeholderText="Select pay period"
+                            selected={form.period}
+                            onChange={date => setForm({ ...form, period: date })}
+                            dateFormat="MMMM yyyy"
+                            showMonthYearPicker
+                            placeholderText="Select pay month"
                             className="payroll-date-picker"
-                            monthsShown={2}
                         />
                     </div>
  
@@ -195,12 +193,12 @@ const handleView = async(id) => {
                         <tr>
                             <th>Employee</th>
                             <th>Period</th>
-                            <th>Reg Hrs</th>
-                            <th>OT Hrs</th>
+                            <th>Attendance</th>
                             <th>Gross Pay</th>
-                            <th>Tax Code</th>
-                            <th>Emp Tax %</th>
-                            <th>Tax Deducted</th>
+                            <th>PF</th>
+                            <th>ESIC</th>
+                            <th>Prof. Tax</th>
+                            <th>Income Tax</th>
                             <th>Net Pay</th>
                             <th>Actions</th>
                         </tr>
@@ -226,24 +224,23 @@ const handleView = async(id) => {
                                         <span>{p.employeeId?.firstName} {p.employeeId?.lastName}</span>
                                     </td>
                                     <td>
-                                        <div className="payroll-period">
-                                            <span>{format(new Date(p.periodStart), "MM/dd/yy")}</span>
-                                            <span className="period-sep">→</span>
-                                            <span>{format(new Date(p.periodEnd), "MM/dd/yy")}</span>
+                                        {p.year && p.month
+                                        ? format(new Date(p.year, p.month - 1), "MMMM yyyy")
+                                        : "—"}
+                                     </td>
+                                    <td>
+                                        <div className="payroll-attendance">
+                                            <span className="attendance-present">{p.presentDays}P</span>
+                                            <span className="period-sep">/</span>
+                                            <span className="attendance-absent">{p.absentDays}A</span>
                                         </div>
                                     </td>
-                                    <td>{p.regularHours} hrs</td>
-                                    <td>{p.overtimeHours} hrs</td>
-                                    <td className="payroll-gross">${p.grossEarnings?.toFixed(2)}</td>
-                                    <td>
-                                        {p.taxCode
-                                            ? <span className="payroll-tax-badge">{p.taxCode}</span>
-                                            : <span className="payroll-no-tax">No bracket</span>
-                                        }
-                                    </td>
-                                    <td>{p.employeePercentage}%</td>
-                                    <td className="payroll-deduction">-${p.taxDeduction?.toFixed(2)}</td>
-                                    <td className="payroll-net">${p.netPay?.toFixed(2)}</td>
+                                    <td className="payroll-gross">₹{p.grossEarnings?.toFixed(2)}</td>
+                                    <td className="payroll-deduction">-₹{p.pfDeduction?.toFixed(2)}</td>
+                                    <td className="payroll-deduction">-₹{p.esicDeduction?.toFixed(2)}</td>
+                                    <td className="payroll-deduction">-₹{p.professionalTax?.toFixed(2)}</td>
+                                    <td className="payroll-deduction">-₹{p.incomeTax?.toFixed(2)}</td>
+                                    <td className="payroll-net">₹{p.netPay?.toFixed(2)}</td>
                                     <td>
                                         <div className="payroll-actions">
                                             <button className="p-action-btn p-view-btn" onClick={() => handleView(p._id)} title="View">

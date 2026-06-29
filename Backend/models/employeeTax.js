@@ -48,9 +48,4 @@ const employeeTaxSchema = new mongoose.Schema({
         timestamps: true
     });
 
-// employeeTaxSchema.index(
-//   { employeeId: 1, taxCode: 1 },
-//   { unique: true }
-// );
-
 export default mongoose.model("EmployeeTax", employeeTaxSchema);

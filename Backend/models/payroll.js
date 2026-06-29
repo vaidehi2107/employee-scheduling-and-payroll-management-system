@@ -12,24 +12,80 @@ const payrollSchema = new mongoose.Schema({
         ref: "Company",
         required: true
     },
-    
-    periodStart: { type: Date, required: true },
-    periodEnd:   { type: Date, required: true },
 
-    regularHours:   Number,
-    overtimeHours:  Number,
-    grossEarnings:  Number,   // sum of totalEarnings from attendance
-
-    taxId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Tax",
+    month: {
+        type: Number, // 1-12
+        required: true
     },
-    taxCode:              String,
-    employeePercentage:   Number,
-    employerContribution: Number,
-    taxDeduction:         Number,   // grossEarnings * employeePercentage / 100
-    employerTaxAmount:    Number,   // grossEarnings * employerContribution / 100
-    netPay:               Number,   // grossEarnings - taxDeduction
-}, {timestamps: true});
+
+    year: {
+        type: Number, // e.g. 2026
+        required: true
+    },
+
+    // Attendance Summary
+    workingDays: {
+        type: Number,
+        default: 0
+    },
+
+    presentDays: {
+        type: Number,
+        default: 0
+    },
+
+    absentDays: {
+        type: Number,
+        default: 0
+    },
+
+    // Salary
+    grossEarnings: {
+        type: Number,
+        default: 0
+    },
+
+    dailySalary: {
+        type: Number,
+        default: 0
+    },
+
+    attendanceDeduction: {
+        type: Number,
+        default: 0
+    },
+
+    // Deductions
+    pfDeduction: {
+        type: Number,
+        default: 0
+    },
+
+    esicDeduction: {
+        type: Number,
+        default: 0
+    },
+
+    professionalTax: {
+        type: Number,
+        default: 0
+    },
+
+    incomeTax: {
+        type: Number,
+        default: 0
+    },
+
+    totalDeductions: {
+        type: Number,
+        default: 0
+    },
+
+    netPay: {
+        type: Number,
+        default: 0
+    }
+
+}, { timestamps: true });
 
 export default mongoose.model("Payroll", payrollSchema);

@@ -3,6 +3,7 @@ import Attendance from "../models/attendance.js";
 import Employee from "../models/employee.js";
 import Payroll from "../models/payroll.js";
 import { verifyToken } from "../middleware.js";
+import { getAttendanceSummary } from "../services/getAttendanceSummary.js";
 
 const router = express.Router();
 
@@ -13,11 +14,11 @@ const isLockedByPayroll = async (attendanceId) => {
 
     const payroll = await Payroll.findOne({
         employeeId: record.employeeId,
-        periodStart: { $lte: record.date }, //periodstart ajni attendance date ya eni pelani hoy to lock
-        periodEnd: {$gte: record.date} //periodend ajni attendance date ya eni pachi ni hoy to lock
+        periodStart: { $lte: record.date },
+        periodEnd: {$gte: record.date}
     });
 
-    return !!payroll; //converts payroll into boolean - locked if true else false
+    return !!payroll;
 };
 
 
@@ -26,17 +27,15 @@ router.post("/attendance", verifyToken, async (req,res) => {
     try{
         const employee = await Employee.findOne({ 
             _id: req.body.employeeId, 
-            companyId: req.companyId  // make sure employee belongs to this company
+            companyId: req.companyId
         });
         if (!employee) {
             return res.status(404).json({message: "Employee not found"});
         }
 
-        // Joining date check
         const attendanceDate = new Date(req.body.date);
         const joiningDate = new Date(employee.joiningDate);
 
-        // strip time — compare dates only
         attendanceDate.setHours(0, 0, 0, 0);
         joiningDate.setHours(0, 0, 0, 0);
 
@@ -52,38 +51,34 @@ router.post("/attendance", verifyToken, async (req,res) => {
         });
         const savedAttendance = await attendance.save();
         res.status(201).json(savedAttendance);
-   
+
 
     }catch(err){
         res.status(500).json({message: err.message});
     }
 });
 
-//Filter Attendance
+//Filter Attendance (now also returns working/present/absent summary)
 router.get("/attendance/filter", verifyToken, async (req,res) => {
     try {
 
         const {startDate, endDate, employeeId } = req.query;
 
-        let filter = { companyId: req.companyId }; // filter object
+        let filter = { companyId: req.companyId };
 
-        //Date Range filter
         if(startDate && endDate) {
             filter.date = {
-                $gte: new Date(startDate), //greater than equal to
-                $lte: new Date(endDate)   //less than equal to
+                $gte: new Date(startDate),
+                $lte: new Date(endDate)
             };
         }
 
-        //Employee filter
         if(employeeId) {
             filter.employeeId = employeeId;
         }
 
         const attendance = await Attendance.find(filter).populate("employeeId", "firstName lastName");
-        //populate - search for employeeid and returns firstname and lastname - similar to joins in sql
 
-        //Attach islocked to every record
         const lockedAttendance = await Promise.all(
             attendance.map(async (record) => {
                 const payroll = await Payroll.findOne({
@@ -95,7 +90,22 @@ router.get("/attendance/filter", verifyToken, async (req,res) => {
             })
         );
 
-        res.json(lockedAttendance);
+        // Build summary only when filtering by a single employee + date range
+        let summary = null;
+        if (employeeId && startDate && endDate) {
+            const employee = await Employee.findOne({ _id: employeeId, companyId: req.companyId });
+            if (employee) {
+                summary = await getAttendanceSummary(
+                    employeeId,
+                    req.companyId,
+                    employee.joiningDate,
+                    new Date(startDate),
+                    new Date(endDate)
+                );
+            }
+        }
+
+        res.json({ records: lockedAttendance, summary });
 
     }catch(err) {
         res.status(500).json({message: err.message});
@@ -133,11 +143,9 @@ router.put("/attendance/update/:id", verifyToken, async (req,res) => {
             return res.status(404).json({message: "Employee not found"});
         }
 
-        // Joining date check
         const attendanceDate = new Date(req.body.date);
         const joiningDate = new Date(employee.joiningDate);
 
-        // strip time — compare dates only
         attendanceDate.setHours(0, 0, 0, 0);
         joiningDate.setHours(0, 0, 0, 0);
 
@@ -146,7 +154,7 @@ router.put("/attendance/update/:id", verifyToken, async (req,res) => {
                 message: `Attendance date cannot be before joining date (${joiningDate.toDateString()}).`
             });
         }
-        
+
         const updatedAttendance = await Attendance.findByIdAndUpdate(
                 id,
                 { ...req.body },

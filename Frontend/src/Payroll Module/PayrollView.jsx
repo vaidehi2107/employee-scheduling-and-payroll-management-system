@@ -4,6 +4,7 @@ function PayrollView({ payroll, onClose, onDownload }) {
     if (!payroll) return null;
 
     const emp = payroll.employeeId;
+    const periodLabel = format(new Date(payroll.year, payroll.month - 1), "MMMM yyyy");
 
     return (
         <div className="pv-overlay" onClick={onClose}>
@@ -17,9 +18,7 @@ function PayrollView({ payroll, onClose, onDownload }) {
                         </div>
                         <div>
                             <h3 className="pv-name">{emp?.firstName} {emp?.lastName}</h3>
-                            <p className="pv-period">
-                                {format(new Date(payroll.periodStart), "MMM dd, yyyy")} — {format(new Date(payroll.periodEnd), "MMM dd, yyyy")}
-                            </p>
+                            <p className="pv-period">{periodLabel}</p>
                         </div>
                     </div>
                     <button className="pv-close-btn" onClick={onClose}>
@@ -30,16 +29,20 @@ function PayrollView({ payroll, onClose, onDownload }) {
                     </button>
                 </div>
 
-                {/* Hours Section */}
+                {/* Attendance Section */}
                 <div className="pv-section">
-                    <p className="pv-section-label">Hours Worked</p>
+                    <p className="pv-section-label">Attendance</p>
                     <div className="pv-row">
-                        <span className="pv-key">Regular Hours</span>
-                        <span className="pv-val">{payroll.regularHours} hrs</span>
+                        <span className="pv-key">Working Days</span>
+                        <span className="pv-val">{payroll.workingDays}</span>
                     </div>
                     <div className="pv-row">
-                        <span className="pv-key">Overtime Hours</span>
-                        <span className="pv-val">{payroll.overtimeHours} hrs</span>
+                        <span className="pv-key">Present Days</span>
+                        <span className="pv-val">{payroll.presentDays}</span>
+                    </div>
+                    <div className="pv-row">
+                        <span className="pv-key">Absent Days</span>
+                        <span className="pv-val">{payroll.absentDays}</span>
                     </div>
                 </div>
 
@@ -49,47 +52,44 @@ function PayrollView({ payroll, onClose, onDownload }) {
                 <div className="pv-section">
                     <p className="pv-section-label">Earnings</p>
                     <div className="pv-row">
-                        <span className="pv-key">Gross Pay</span>
-                        <span className="pv-val pv-gross">${payroll.grossEarnings?.toFixed(2)}</span>
+                        <span className="pv-key">Daily Salary</span>
+                        <span className="pv-val">₹{payroll.dailySalary?.toFixed(2)}</span>
+                    </div>
+                    <div className="pv-row">
+                        <span className="pv-key">Attendance Deduction</span>
+                        <span className="pv-val pv-deduction">-₹{payroll.attendanceDeduction?.toFixed(2)}</span>
+                    </div>
+                    <div className="pv-row">
+                        <span className="pv-key">Gross Earnings</span>
+                        <span className="pv-val pv-gross">₹{payroll.grossEarnings?.toFixed(2)}</span>
                     </div>
                 </div>
 
                 <div className="pv-divider"/>
 
-                {/* Tax Section */}
+                {/* Deductions Section */}
                 <div className="pv-section">
-                    <p className="pv-section-label">Tax Details</p>
-                    {payroll.taxCode ? (
-                        <>
-                            <div className="pv-row">
-                                <span className="pv-key">Tax Bracket</span>
-                                <span className="pv-val">
-                                    <span className="pv-tax-badge">{payroll.taxCode}</span>
-                                </span>
-                            </div>
-                            <div className="pv-row">
-                                <span className="pv-key">Employee Tax</span>
-                                <span className="pv-val pv-deduction">
-                                    {payroll.employeePercentage}% → -${payroll.taxDeduction?.toFixed(2)}
-                                </span>
-                            </div>
-                            <div className="pv-row">
-                                <span className="pv-key">Employer Contribution</span>
-                                <span className="pv-val pv-employer">
-                                    {payroll.employerContribution}% → ${payroll.employerTaxAmount?.toFixed(2)}
-                                </span>
-                            </div>
-                        </>
-                    ) : (
-                        <div className="pv-no-tax">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                <circle cx="12" cy="12" r="10"/>
-                                <line x1="12" y1="8" x2="12" y2="12"/>
-                                <line x1="12" y1="16" x2="12.01" y2="16"/>
-                            </svg>
-                            No active tax bracket matched this gross pay
-                        </div>
-                    )}
+                    <p className="pv-section-label">Deductions</p>
+                    <div className="pv-row">
+                        <span className="pv-key">PF</span>
+                        <span className="pv-val pv-deduction">-₹{payroll.pfDeduction?.toFixed(2)}</span>
+                    </div>
+                    <div className="pv-row">
+                        <span className="pv-key">ESIC</span>
+                        <span className="pv-val pv-deduction">-₹{payroll.esicDeduction?.toFixed(2)}</span>
+                    </div>
+                    <div className="pv-row">
+                        <span className="pv-key">Professional Tax</span>
+                        <span className="pv-val pv-deduction">-₹{payroll.professionalTax?.toFixed(2)}</span>
+                    </div>
+                    <div className="pv-row">
+                        <span className="pv-key">Income Tax</span>
+                        <span className="pv-val pv-deduction">-₹{payroll.incomeTax?.toFixed(2)}</span>
+                    </div>
+                    <div className="pv-row">
+                        <span className="pv-key">Total Deductions</span>
+                        <span className="pv-val pv-deduction">-₹{payroll.totalDeductions?.toFixed(2)}</span>
+                    </div>
                 </div>
 
                 <div className="pv-divider"/>
@@ -97,7 +97,7 @@ function PayrollView({ payroll, onClose, onDownload }) {
                 {/* Net Pay */}
                 <div className="pv-net-row">
                     <span className="pv-net-label">Net Pay</span>
-                    <span className="pv-net-amount">${payroll.netPay?.toFixed(2)}</span>
+                    <span className="pv-net-amount">₹{payroll.netPay?.toFixed(2)}</span>
                 </div>
 
                 {/* Footer */}

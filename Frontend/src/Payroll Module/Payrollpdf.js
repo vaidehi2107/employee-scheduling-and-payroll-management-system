@@ -5,13 +5,13 @@ export const downloadPayrollPDF = (payroll) => {
     const doc = new jsPDF();
     const emp = payroll.employeeId;
     const name = `${emp?.firstName || ""} ${emp?.lastName || ""}`.trim();
-    const periodStart = format(new Date(payroll.periodStart), "MM/dd/yyyy");
-    const periodEnd   = format(new Date(payroll.periodEnd),   "MM/dd/yyyy");
+    const periodLabel = format(new Date(payroll.year, payroll.month - 1), "MMMM yyyy");
 
     const purple = [92, 63, 163];
     const dark   = [26, 26, 46];
     const gray   = [136, 136, 136];
     const white  = [255, 255, 255];
+    const red    = [220, 53, 69];
 
     // ── Header band ──
     doc.setFillColor(...purple);
@@ -35,7 +35,7 @@ export const downloadPayrollPDF = (payroll) => {
     doc.setFontSize(10);
     doc.setFont("helvetica", "normal");
     doc.setTextColor(...gray);
-    doc.text(`Pay Period: ${periodStart} – ${periodEnd}`, 20, 60);
+    doc.text(`Pay Period: ${periodLabel}`, 20, 60);
 
     // ── Divider ──
     doc.setDrawColor(220, 220, 235);
@@ -64,10 +64,11 @@ export const downloadPayrollPDF = (payroll) => {
 
     let y = 76;
 
-    // Hours
-    y = section("Hours Worked", y);
-    y = row("Regular Hours", `${payroll.regularHours} hrs`, y);
-    y = row("Overtime Hours", `${payroll.overtimeHours} hrs`, y);
+    // Attendance
+    y = section("Attendance", y);
+    y = row("Working Days", `${payroll.workingDays}`, y);
+    y = row("Present Days", `${payroll.presentDays}`, y);
+    y = row("Absent Days", `${payroll.absentDays}`, y);
     y += 4;
 
     doc.line(20, y, 190, y);
@@ -75,25 +76,22 @@ export const downloadPayrollPDF = (payroll) => {
 
     // Earnings
     y = section("Earnings", y);
-    y = row("Gross Pay", `$${payroll.grossEarnings?.toFixed(2)}`, y, [45, 122, 79]);
+    y = row("Daily Salary", `Rs. ${payroll.dailySalary?.toFixed(2)}`, y);
+    y = row("Attendance Deduction", `-Rs. ${payroll.attendanceDeduction?.toFixed(2)}`, y, red);
+    y = row("Gross Earnings", `Rs. ${payroll.grossEarnings?.toFixed(2)}`, y, [45, 122, 79]);
+
     y += 4;
 
     doc.line(20, y, 190, y);
     y += 8;
 
-    // Tax
-    y = section("Tax Details", y);
-    if (payroll.taxCode) {
-        y = row("Tax Bracket", payroll.taxCode, y);
-        y = row(`Employee Tax (${payroll.employeePercentage}%)`, `-$${payroll.taxDeduction?.toFixed(2)}`, y, [220, 53, 69]);
-        y = row(`Employer Contribution (${payroll.employerContribution}%)`, `$${payroll.employerTaxAmount?.toFixed(2)}`, y, [92, 63, 163]);
-    } else {
-        doc.setFontSize(10);
-        doc.setFont("helvetica", "italic");
-        doc.setTextColor(...gray);
-        doc.text("No active tax bracket matched this gross pay.", 20, y);
-        y += 8;
-    }
+    // Deductions
+    y = section("Deductions", y);
+    y = row("PF", `-Rs. ${payroll.pfDeduction?.toFixed(2)}`, y, red);
+    y = row("ESIC", `-Rs. ${payroll.esicDeduction?.toFixed(2)}`, y, red);
+    y = row("Professional Tax", `-Rs. ${payroll.professionalTax?.toFixed(2)}`, y, red);
+    y = row("Income Tax", `-Rs. ${payroll.incomeTax?.toFixed(2)}`, y, red);
+    y = row("Total Deductions", `-Rs. ${payroll.totalDeductions?.toFixed(2)}`, y, red);
     y += 4;
 
     // ── Net Pay band ──
@@ -108,7 +106,8 @@ export const downloadPayrollPDF = (payroll) => {
     doc.setFontSize(16);
     doc.setFont("helvetica", "bold");
     doc.setTextColor(...purple);
-    doc.text(`$${payroll.netPay?.toFixed(2)}`, 185, y + 14, { align: "right" });
+    doc.text(`Rs. ${payroll.netPay?.toFixed(2)}`, 185, y + 14, { align: "right" });
+
 
     // ── Footer ──
     doc.setFontSize(8);
@@ -117,6 +116,6 @@ export const downloadPayrollPDF = (payroll) => {
     doc.text("This is a system-generated payroll document.", 105, 285, { align: "center" });
 
     // Save
-    const filename = `Payroll_${name.replace(" ", "_")}_${format(new Date(payroll.periodEnd), "MMddyyyy")}.pdf`;
+    const filename = `Payroll_${name.replace(" ", "_")}_${format(new Date(payroll.year, payroll.month - 1), "MM_yyyy")}.pdf`;
     doc.save(filename);
 };

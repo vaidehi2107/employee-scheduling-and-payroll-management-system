@@ -36,6 +36,7 @@ function Attendance(){
 
     const [employees, setEmployees] = useState([]);
     const [attendance, setAttendance] = useState([]);
+    const [summary, setSummary] = useState({ workingDays: 0, presentDays: 0, absentDays: 0 });
 
     const [employeeId, setEmployeeId] = useState("");
     const [selectedMonth, setSelectedMonth] = useState(new Date());
@@ -68,11 +69,11 @@ function Attendance(){
     useEffect(() => {
         if (!employeeId) {
             setAttendance([]);
+            setSummary({ workingDays: 0, presentDays: 0, absentDays: 0 });
             return;
         }
         const { start, end } = getMonthRange(selectedMonth);
         searchAttendance(start, end, employeeId);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [employeeId, selectedMonth]);
 
     const searchAttendance = async (startDate, endDate, empId) => {
@@ -81,7 +82,8 @@ function Attendance(){
                 "/attendance/filter",
                 { params: { employeeId: empId, startDate: startDate.toISOString(), endDate: endDate.toISOString() } }
             );
-            setAttendance(response.data);
+            setAttendance(response.data.records);
+            setSummary(response.data.summary || { workingDays: 0, presentDays: 0, absentDays: 0 });
         } catch (err) {
             console.log(err);
         }
@@ -99,6 +101,7 @@ function Attendance(){
             setAttendance(attendance.filter(item => item._id !== id));
             setConfirmDeleteId(null);
             showToast("Attendance record deleted.", "delete");
+            refreshAttendance(); // keep summary in sync after delete
         } catch (err) {
             console.log(err);
         }
@@ -113,9 +116,6 @@ function Attendance(){
         return d;
     }, []);
 
-    // Build every calendar day of the selected month, merged with whatever
-    // attendance records exist. Weekends are treated as days off, and days
-    // after today are "upcoming" (no status yet).
     const calendarDays = useMemo(() => {
         if (!employeeId) return [];
         const { start, end } = getMonthRange(selectedMonth);
@@ -138,10 +138,6 @@ function Attendance(){
         }
         return days;
     }, [attendance, selectedMonth, employeeId, today]);
-
-    const workingDays = calendarDays.filter(d => d.status === "present" || d.status === "absent");
-    const presentCount = calendarDays.filter(d => d.status === "present").length;
-    const absentCount = workingDays.length - presentCount;
 
     const statusLabel = { present: "Present", absent: "Absent", weekend: "Week Off", upcoming: "Upcoming" };
 
@@ -210,9 +206,9 @@ function Attendance(){
             <h3>{selectedEmployee ? `${selectedEmployee.firstName} ${selectedEmployee.lastName}` : ""}</h3>
             <span>{format(selectedMonth, "MMMM yyyy")}</span>
             <div className="month-view-stats">
-              <span className="stat-pill total">{workingDays.length} Working Days</span>
-              <span className="stat-pill present">{presentCount} Present</span>
-              <span className="stat-pill absent">{absentCount} Absent</span>
+              <span className="stat-pill total">{summary.workingDays} Working Days</span>
+              <span className="stat-pill present">{summary.presentDays} Present</span>
+              <span className="stat-pill absent">{summary.absentDays} Absent</span>
             </div>
           </div>
 
