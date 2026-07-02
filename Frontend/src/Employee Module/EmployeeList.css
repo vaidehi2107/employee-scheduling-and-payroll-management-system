@@ -172,6 +172,16 @@
     color: white;
 }
 
+.action-btn.leave {
+    background: #eaf2fc;
+    color: #2b6cb0;
+}
+
+.action-btn.leave:hover {
+    background: #2b6cb0;
+    color: white;
+}
+
 /* ── Divider ── */
 .emp-divider {
     height: 1px;

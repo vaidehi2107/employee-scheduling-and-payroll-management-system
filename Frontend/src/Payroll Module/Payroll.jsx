@@ -26,6 +26,13 @@ const showToast = (message, type="success") => {
     setTimeout(() => setToast(null), 2000);
 };
 
+// absentDays can be fractional (e.g. 1.5) since Half-Day Unpaid counts as
+// half a day. Only show decimals when there actually are any.
+const formatDays = (value) => {
+    if (value === undefined || value === null) return "—";
+    return Number.isInteger(value) ? value : value.toFixed(1);
+};
+
 useEffect(() => {
     fetchEmployees();
     fetchPayrolls();
@@ -230,9 +237,9 @@ const handleView = async(id) => {
                                      </td>
                                     <td>
                                         <div className="payroll-attendance">
-                                            <span className="attendance-present">{p.presentDays}P</span>
+                                            <span className="attendance-present">{formatDays(p.presentDays)}P</span>
                                             <span className="period-sep">/</span>
-                                            <span className="attendance-absent">{p.absentDays}A</span>
+                                            <span className="attendance-absent">{formatDays(p.absentDays)}A</span>
                                         </div>
                                     </td>
                                     <td className="payroll-gross">₹{p.grossEarnings?.toFixed(2)}</td>

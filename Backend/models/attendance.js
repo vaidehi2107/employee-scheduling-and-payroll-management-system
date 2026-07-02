@@ -23,6 +23,20 @@ const attendanceSchema = new mongoose.Schema({
     breakOut: String,
     outTime: String,
 
+    status: {
+    type: String,
+    enum: [
+        "Present",
+        "Paid Leave",
+        "Non-Paid Leave",
+        "Holiday",
+        "Week Off",
+        "Half-Day Paid",
+        "Half-Day Unpaid"
+    ],
+    default: "Present"
+}
+
 });
 
 export default mongoose.model("Attendance", attendanceSchema);

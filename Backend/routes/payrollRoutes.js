@@ -36,6 +36,10 @@ router.post("/payroll/generate", verifyToken, async (req, res) => {
 
         // monthlyGross is the employee's full monthly gross as already computed on SalaryStructure
         const monthlyGross = salary.grossEarnings || 0;
+        const basicPay = salary.basicPay || 0;
+        const da = salary.da || 0;
+        const hra = salary.hra || 0;
+        const specialAllowance = salary.specialAllowance || 0;
 
         // 2. Fetch employee (needed for joiningDate)
         const employee = await Employee.findOne({ _id: employeeId, companyId: req.companyId });
@@ -48,7 +52,15 @@ router.post("/payroll/generate", verifyToken, async (req, res) => {
         const periodStart = new Date(year, month - 1, 1);
         const periodEnd = new Date(year, month, 0, 23, 59, 59); // last day of month
 
-        const { workingDays, presentDays, absentDays } = await getAttendanceSummary(
+        const {
+            workingDays,
+            presentDays,
+            paidLeaveDays,
+            nonPaidLeaveDays,
+            halfDayPaidDays,
+            halfDayUnpaidDays,
+            unpaidUnits
+        } = await getAttendanceSummary(
             employeeId,
             req.companyId,
             employee.joiningDate,
@@ -56,16 +68,26 @@ router.post("/payroll/generate", verifyToken, async (req, res) => {
             periodEnd
         );
 
+        // absentDays is kept as the name of the deduction-driving figure for
+        // backward compatibility with the schema/UI, but it's now a
+        // whole-day-equivalent count: full Non-Paid Leave days (and unmarked
+        // working days) count as 1, Half-Day Unpaid counts as 0.5.
+        // Half-Day Paid and Paid Leave are fully paid, so they don't reduce it.
+        const absentDays = unpaidUnits;
+
         // 4. Daily salary based on total calendar days in the month (not working days)
         const totalDaysInMonth = new Date(year, month, 0).getDate();
         const dailySalary = parseFloat((monthlyGross / totalDaysInMonth).toFixed(2));
         const attendanceDeduction = parseFloat((dailySalary * absentDays).toFixed(2));
 
-        // Gross actually earned this month after attendance deduction
-        const grossEarnings = parseFloat((monthlyGross - attendanceDeduction).toFixed(2));
+        // Gross Earnings is the employee's full monthly gross (Basic + DA +
+        // HRA, i.e. what they're entitled to before any deductions).
+        // Attendance deduction is NOT netted out here - it's applied later,
+        // alongside PF/ESIC/tax, in Total Deductions.
+        const grossEarnings = parseFloat(monthlyGross.toFixed(2));
 
-        // 5. PF / ESIC - already computed and stored on SalaryStructure, used as-is.
-        //    Attendance is deducted once already (via grossEarnings above); not re-applied here.
+        // 5. PF / ESIC - already computed and stored on SalaryStructure
+        
         const pfDeduction = parseFloat((salary.pfAmount || 0).toFixed(2));
         const esicDeduction = parseFloat((salary.esicAmount || 0).toFixed(2));
 
@@ -99,14 +121,15 @@ router.post("/payroll/generate", verifyToken, async (req, res) => {
             : 0;
         const incomeTax = parseFloat((annualIncomeTax / 12).toFixed(2));
 
-        // Employer-side contribution tied to the IT slab (not deducted from employee, stored for records)
+    
         const employerContribution = taxSlab
             ? parseFloat(((annualizedEarnings * taxSlab.employerContribution) / 100 / 12).toFixed(2))
             : 0;
 
-        // 8. Totals
+        // 8. Totals - attendance deduction now lives alongside the other
+        // deductions rather than being netted out of grossEarnings.
         const totalDeductions = parseFloat(
-            (pfDeduction + esicDeduction + professionalTax + incomeTax).toFixed(2)
+            (pfDeduction + esicDeduction + professionalTax + incomeTax + attendanceDeduction).toFixed(2)
         );
         const netPay = parseFloat((grossEarnings - totalDeductions).toFixed(2));
 
@@ -116,9 +139,19 @@ router.post("/payroll/generate", verifyToken, async (req, res) => {
             companyId: req.companyId,
             month,
             year,
+            periodStart,
+            periodEnd,
             workingDays,
             presentDays,
+            paidLeaveDays,
+            nonPaidLeaveDays,
+            halfDayPaidDays,
+            halfDayUnpaidDays,
             absentDays,
+            basicPay,
+            da,
+            hra,
+            specialAllowance,
             grossEarnings,
             dailySalary,
             attendanceDeduction,

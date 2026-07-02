@@ -309,6 +309,21 @@ tbody tr:hover {
     color: #dc3545;
 }
 
+.month-view-stats .stat-pill.paid-leave {
+    background: rgba(23, 130, 173, 0.1);
+    color: #1782ad;
+}
+
+.month-view-stats .stat-pill.unpaid-leave {
+    background: rgba(224, 130, 24, 0.1);
+    color: #b5680f;
+}
+
+.month-view-stats .stat-pill.half-day {
+    background: rgba(90, 110, 220, 0.1);
+    color: #4c5cc4;
+}
+
 /* ── Status badges ── */
 .status-badge {
     display: inline-block;
@@ -338,6 +353,31 @@ tbody tr:hover {
 .status-upcoming {
     background: rgba(124, 92, 191, 0.08);
     color: #9a8cc7;
+}
+
+.status-paidLeave {
+    background: rgba(23, 130, 173, 0.1);
+    color: #1782ad;
+}
+
+.status-nonPaidLeave {
+    background: rgba(224, 130, 24, 0.1);
+    color: #b5680f;
+}
+
+.status-halfDay {
+    background: rgba(90, 110, 220, 0.1);
+    color: #4c5cc4;
+}
+
+.status-holiday {
+    background: rgba(198, 88, 176, 0.1);
+    color: #ad3f97;
+}
+
+.status-weekOff {
+    background: rgba(0, 0, 0, 0.05);
+    color: #999;
 }
 
 /* ── Weekend / upcoming rows ── */

@@ -59,7 +59,7 @@ export const downloadPayrollPDF = (payroll) => {
         doc.setTextColor(...valueColor);
         doc.setFont("helvetica", "bold");
         doc.text(value, 190, y, { align: "right" });
-        return y + 8;
+        return y + 6.5;
     };
 
     let y = 76;
@@ -68,7 +68,10 @@ export const downloadPayrollPDF = (payroll) => {
     y = section("Attendance", y);
     y = row("Working Days", `${payroll.workingDays}`, y);
     y = row("Present Days", `${payroll.presentDays}`, y);
-    y = row("Absent Days", `${payroll.absentDays}`, y);
+    y = row("Paid Leave", `${payroll.paidLeaveDays}`, y);
+    y = row("Non-Paid Leave", `${payroll.nonPaidLeaveDays}`, y);
+    y = row("Half-Day (Paid)", `${payroll.halfDayPaidDays}`, y);
+    y = row("Half-Day (Unpaid)", `${payroll.halfDayUnpaidDays}`, y);
     y += 4;
 
     doc.line(20, y, 190, y);
@@ -76,8 +79,11 @@ export const downloadPayrollPDF = (payroll) => {
 
     // Earnings
     y = section("Earnings", y);
+    y = row("Basic Pay", `Rs. ${payroll.basicPay?.toFixed(2)}`, y);
+    y = row("DA", `Rs. ${payroll.da?.toFixed(2)}`, y);
+    y = row("HRA", `Rs. ${payroll.hra?.toFixed(2)}`, y);
+    y = row("Special Allowance", `Rs. ${payroll.specialAllowance?.toFixed(2)}`, y);
     y = row("Daily Salary", `Rs. ${payroll.dailySalary?.toFixed(2)}`, y);
-    y = row("Attendance Deduction", `-Rs. ${payroll.attendanceDeduction?.toFixed(2)}`, y, red);
     y = row("Gross Earnings", `Rs. ${payroll.grossEarnings?.toFixed(2)}`, y, [45, 122, 79]);
 
     y += 4;
@@ -87,6 +93,7 @@ export const downloadPayrollPDF = (payroll) => {
 
     // Deductions
     y = section("Deductions", y);
+    y = row("Attendance Deduction", `-Rs. ${payroll.attendanceDeduction?.toFixed(2)}`, y, red);
     y = row("PF", `-Rs. ${payroll.pfDeduction?.toFixed(2)}`, y, red);
     y = row("ESIC", `-Rs. ${payroll.esicDeduction?.toFixed(2)}`, y, red);
     y = row("Professional Tax", `-Rs. ${payroll.professionalTax?.toFixed(2)}`, y, red);

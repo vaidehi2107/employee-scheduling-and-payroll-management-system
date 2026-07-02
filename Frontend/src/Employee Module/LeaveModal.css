@@ -1,0 +1,440 @@
+/* ── Overlay & dialog ── */
+.leave-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(26, 26, 46, 0.45);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1100;
+    padding: 20px;
+}
+
+.leave-modal-dialog {
+    background: #fff;
+    border-radius: 18px;
+    width: 460px;
+    max-width: 100%;
+    max-height: 85vh;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 20px 60px rgba(26, 20, 60, 0.25);
+    font-family: 'DM Sans', sans-serif;
+    overflow: hidden;
+}
+
+/* ── Header ── */
+.leave-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 22px 16px;
+    border-bottom: 1px solid #f0f0f8;
+}
+
+.leave-modal-identity {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.leave-modal-avatar {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #7c5cbf, #5c3fa3);
+    color: white;
+    font-size: 13px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    letter-spacing: 0.05em;
+}
+
+.leave-modal-identity h3 {
+    font-family: 'Sora', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    color: #1a1a2e;
+    margin: 0;
+}
+
+.leave-modal-identity p {
+    font-size: 12px;
+    color: #999;
+    margin: 2px 0 0;
+}
+
+.leave-modal-close {
+    width: 32px;
+    height: 32px;
+    border: none;
+    border-radius: 8px;
+    background: #f5f4fb;
+    color: #7a7a8c;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+    flex-shrink: 0;
+}
+
+.leave-modal-close:hover {
+    background: #ece9f8;
+    color: #3a3a5c;
+}
+
+/* ── Tabs ── */
+.leave-modal-tabs {
+    display: flex;
+    gap: 6px;
+    padding: 14px 22px 0;
+}
+
+.leave-tab-btn {
+    flex: 1;
+    padding: 9px 10px;
+    border: none;
+    background: #f5f4fb;
+    color: #7a7a8c;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    border-radius: 10px 10px 0 0;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+}
+
+.leave-tab-btn.active {
+    background: #fff;
+    color: #5c3fa3;
+    box-shadow: inset 0 -2px 0 #7c5cbf;
+}
+
+/* ── Body ── */
+.leave-modal-body {
+    padding: 20px 22px 22px;
+    overflow-y: auto;
+}
+
+/* ── Apply form ── */
+.leave-form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.leave-type-toggle {
+    display: flex;
+    gap: 8px;
+}
+
+.leave-type-chip {
+    flex: 1;
+    padding: 10px;
+    border-radius: 10px;
+    border: 1.5px solid #e4e1f4;
+    background: #fff;
+    color: #7a7a8c;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.leave-type-chip.active {
+    border-color: #7c5cbf;
+    background: linear-gradient(135deg, #7c5cbf, #5c3fa3);
+    color: #fff;
+}
+
+.leave-date-row {
+    display: flex;
+    gap: 12px;
+}
+
+.leave-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    flex: 1;
+}
+
+.leave-field label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: #aaa;
+}
+
+.leave-field input,
+.leave-field textarea {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13.5px;
+    color: #1a1a2e;
+    border: 1.5px solid #e4e1f4;
+    border-radius: 10px;
+    padding: 9px 11px;
+    outline: none;
+    transition: border-color 0.15s;
+    resize: vertical;
+}
+
+.leave-field input:focus,
+.leave-field textarea:focus {
+    border-color: #7c5cbf;
+}
+
+.leave-field input:disabled {
+    background: #f5f4fb;
+    color: #aaa;
+}
+
+.leave-halfday-check {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    padding: 10px 12px;
+    background: #f8f7fc;
+    border-radius: 10px;
+}
+
+.leave-halfday-check input {
+    accent-color: #7c5cbf;
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+}
+
+.leave-halfday-check span:nth-child(2) {
+    font-size: 13px;
+    font-weight: 600;
+    color: #3a3a5c;
+}
+
+.leave-halfday-hint {
+    font-size: 11px;
+    color: #999;
+    margin-left: auto;
+}
+
+.leave-form-error {
+    background: #fef0f0;
+    color: #c0392b;
+    font-size: 12.5px;
+    font-weight: 500;
+    padding: 10px 12px;
+    border-radius: 8px;
+}
+
+.leave-submit-btn {
+    padding: 12px;
+    background: linear-gradient(135deg, #7c5cbf, #5c3fa3);
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 4px 14px rgba(92, 63, 163, 0.3);
+    transition: opacity 0.2s;
+}
+
+.leave-submit-btn:hover {
+    opacity: 0.9;
+}
+
+.leave-submit-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* ── History & balance ── */
+.leave-history-toolbar {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 14px;
+}
+
+.leave-history-toolbar select {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    color: #3a3a5c;
+    border: 1.5px solid #e4e1f4;
+    border-radius: 8px;
+    padding: 6px 10px;
+    background: #fff;
+    cursor: pointer;
+}
+
+.leave-balance-cards {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-bottom: 18px;
+}
+
+.leave-balance-card {
+    background: #f8f7fc;
+    border-radius: 12px;
+    padding: 12px 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    text-align: center;
+}
+
+.leave-balance-card.highlight {
+    background: linear-gradient(135deg, #7c5cbf, #5c3fa3);
+}
+
+.leave-balance-label {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: #999;
+}
+
+.leave-balance-card.highlight .leave-balance-label {
+    color: rgba(255, 255, 255, 0.75);
+}
+
+.leave-balance-value {
+    font-family: 'Sora', sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: #1a1a2e;
+}
+
+.leave-balance-card.highlight .leave-balance-value {
+    color: #fff;
+}
+
+.leave-muted {
+    font-size: 13px;
+    color: #999;
+    text-align: center;
+    padding: 20px 0;
+}
+
+.leave-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.leave-list-item {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 10px;
+    background: #fff;
+    border: 1px solid #ececf5;
+    border-radius: 12px;
+    padding: 12px 14px;
+}
+
+.leave-list-main {
+    flex: 1;
+    min-width: 0;
+}
+
+.leave-list-dates {
+    font-size: 13px;
+    font-weight: 700;
+    color: #1a1a2e;
+    margin-bottom: 6px;
+}
+
+.leave-list-tags {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-bottom: 6px;
+}
+
+.leave-tag {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    padding: 3px 8px;
+    border-radius: 20px;
+}
+
+.leave-tag-paid {
+    background: rgba(124, 92, 191, 0.12);
+    color: #7c5cbf;
+}
+
+.leave-tag-nonpaid {
+    background: rgba(150, 150, 160, 0.15);
+    color: #6a6a78;
+}
+
+.leave-tag-days {
+    background: #f0eef8;
+    color: #5c3fa3;
+}
+
+.leave-list-reason {
+    font-size: 12.5px;
+    color: #777;
+    margin: 0;
+}
+
+.leave-list-delete {
+    width: 30px;
+    height: 30px;
+    border: none;
+    border-radius: 8px;
+    background: #fef0f0;
+    color: #e05252;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: background 0.2s, color 0.2s;
+}
+
+.leave-list-delete:hover {
+    background: #e05252;
+    color: #fff;
+}
+
+.leave-inline-confirm {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    flex-shrink: 0;
+}
+
+.leave-inline-confirm button {
+    font-size: 11px;
+    font-weight: 600;
+    padding: 5px 10px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.leave-inline-confirm button:first-child {
+    background: #e53e3e;
+    color: #fff;
+}
+
+.leave-inline-confirm button:last-child {
+    background: #f1f1f1;
+    color: #333;
+}

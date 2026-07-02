@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import "./EmployeeList.css";
 import API from "../api.js";
 import { Link, useNavigate, useLocation } from "react-router-dom";
+import LeaveModal from "./LeaveModal.jsx";
 
 function EmployeeList() {
     const [employees, setEmployees] = useState([]);
@@ -9,6 +10,7 @@ function EmployeeList() {
     const location = useLocation();
     const [toast, setToast] = useState(null);
     const [confirmDeleteId, setConfirmDeleteId] = useState(null);
+    const [leaveEmployee, setLeaveEmployee] = useState(null);
 
      const showToast = (message, type = "success") => {
         setToast({ message, type });
@@ -108,6 +110,14 @@ function EmployeeList() {
                                         <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
                                     </svg>
                                 </button>
+                                <button className="action-btn leave" onClick={() => setLeaveEmployee(emp)} title="Leave">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                        <rect x="3" y="4" width="18" height="18" rx="2"/>
+                                        <line x1="16" y1="2" x2="16" y2="6"/>
+                                        <line x1="8" y1="2" x2="8" y2="6"/>
+                                        <line x1="3" y1="10" x2="21" y2="10"/>
+                                    </svg>
+                                </button>
                                 </div>
                                 {/* Status badge moved here, below action buttons */}
                                 <span className={`emp-status-badge emp-status-${emp.status}`}>
@@ -157,6 +167,15 @@ function EmployeeList() {
                 </svg>
                 {toast.message}
                 </div>
+            )}
+
+            {/* LEAVE MODAL */}
+            {leaveEmployee && (
+                <LeaveModal
+                    employee={leaveEmployee}
+                    onClose={() => setLeaveEmployee(null)}
+                    showToast={showToast}
+                />
             )}
 
             {/* DELETE CONFIRMATION */}

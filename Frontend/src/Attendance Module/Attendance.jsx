@@ -36,7 +36,7 @@ function Attendance(){
 
     const [employees, setEmployees] = useState([]);
     const [attendance, setAttendance] = useState([]);
-    const [summary, setSummary] = useState({ workingDays: 0, presentDays: 0, absentDays: 0 });
+    const [summary, setSummary] = useState({ workingDays: 0, presentDays: 0, paidLeaveDays: 0, nonPaidLeaveDays: 0, halfDayDays: 0 });
 
     const [employeeId, setEmployeeId] = useState("");
     const [selectedMonth, setSelectedMonth] = useState(new Date());
@@ -69,7 +69,7 @@ function Attendance(){
     useEffect(() => {
         if (!employeeId) {
             setAttendance([]);
-            setSummary({ workingDays: 0, presentDays: 0, absentDays: 0 });
+            setSummary({ workingDays: 0, presentDays: 0, paidLeaveDays: 0, nonPaidLeaveDays: 0, halfDayDays: 0 });
             return;
         }
         const { start, end } = getMonthRange(selectedMonth);
@@ -83,7 +83,7 @@ function Attendance(){
                 { params: { employeeId: empId, startDate: startDate.toISOString(), endDate: endDate.toISOString() } }
             );
             setAttendance(response.data.records);
-            setSummary(response.data.summary || { workingDays: 0, presentDays: 0, absentDays: 0 });
+            setSummary(response.data.summary || { workingDays: 0, presentDays: 0, paidLeaveDays: 0, nonPaidLeaveDays: 0, halfDayDays: 0 });
         } catch (err) {
             console.log(err);
         }
@@ -116,6 +116,24 @@ function Attendance(){
         return d;
     }, []);
 
+    // Map a raw Attendance.status value (from the DB) to the calendar's
+    // display-status keys. Falls through to "present" for any record whose
+    // status we don't specifically recognise, so unexpected values still
+    // render sensibly instead of disappearing.
+    const mapRecordStatus = (record) => {
+        switch (record.status) {
+            case "Paid Leave": return "paidLeave";
+            case "Non-Paid Leave": return "nonPaidLeave";
+            case "Half-Day Paid":
+            case "Half-Day Unpaid":
+                return "halfDay";
+            case "Holiday": return "holiday";
+            case "Week Off": return "weekOff";
+            case "Present":
+            default: return "present";
+        }
+    };
+
     const calendarDays = useMemo(() => {
         if (!employeeId) return [];
         const { start, end } = getMonthRange(selectedMonth);
@@ -128,10 +146,13 @@ function Attendance(){
             const isFuture = dayDate > today;
             const record = attendance.find(item => isSameDay(new Date(item.date), dayDate));
 
+            // A real record (leave applied ahead of time, a holiday marked
+            // in advance, etc.) always reflects its actual status, even on
+            // a future date. "Upcoming" only means "nothing recorded yet".
             let status;
             if (isWeekend) status = "weekend";
+            else if (record) status = mapRecordStatus(record);
             else if (isFuture) status = "upcoming";
-            else if (record) status = "present";
             else status = "absent";
 
             days.push({ date: dayDate, isWeekend, isFuture, record, status });
@@ -139,7 +160,17 @@ function Attendance(){
         return days;
     }, [attendance, selectedMonth, employeeId, today]);
 
-    const statusLabel = { present: "Present", absent: "Absent", weekend: "Week Off", upcoming: "Upcoming" };
+    const statusLabel = {
+        present: "Present",
+        absent: "Absent",
+        weekend: "Week Off",
+        upcoming: "Upcoming",
+        paidLeave: "Paid Leave",
+        nonPaidLeave: "Unpaid Leave",
+        halfDay: "Half-Day",
+        holiday: "Holiday",
+        weekOff: "Week Off"
+    };
 
     return(
      <div className="attendance-container">
@@ -208,7 +239,9 @@ function Attendance(){
             <div className="month-view-stats">
               <span className="stat-pill total">{summary.workingDays} Working Days</span>
               <span className="stat-pill present">{summary.presentDays} Present</span>
-              <span className="stat-pill absent">{summary.absentDays} Absent</span>
+              <span className="stat-pill paid-leave">{summary.paidLeaveDays} Paid Leave</span>
+              <span className="stat-pill unpaid-leave">{summary.nonPaidLeaveDays} Unpaid Leave</span>
+              {/* <span className="stat-pill half-day">{summary.halfDayDays} Half-Day</span> */}
             </div>
           </div>
 

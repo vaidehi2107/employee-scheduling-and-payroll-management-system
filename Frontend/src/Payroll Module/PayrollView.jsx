@@ -29,75 +29,110 @@ function PayrollView({ payroll, onClose, onDownload }) {
                     </button>
                 </div>
 
-                {/* Attendance Section */}
-                <div className="pv-section">
-                    <p className="pv-section-label">Attendance</p>
-                    <div className="pv-row">
-                        <span className="pv-key">Working Days</span>
-                        <span className="pv-val">{payroll.workingDays}</span>
-                    </div>
-                    <div className="pv-row">
-                        <span className="pv-key">Present Days</span>
-                        <span className="pv-val">{payroll.presentDays}</span>
-                    </div>
-                    <div className="pv-row">
-                        <span className="pv-key">Absent Days</span>
-                        <span className="pv-val">{payroll.absentDays}</span>
-                    </div>
-                </div>
+                {/* Scrollable body: everything between header and footer */}
+                <div className="pv-body">
 
-                <div className="pv-divider"/>
+                    {/* Attendance Section — compact stat grid instead of a long row list */}
+                    <div className="pv-section">
+                        <p className="pv-section-label">Attendance</p>
+                        <div className="pv-stat-grid">
+                            <div className="pv-stat">
+                                <div className="pv-stat-value">{payroll.workingDays}</div>
+                                <div className="pv-stat-label">Working</div>
+                            </div>
+                            <div className="pv-stat">
+                                <div className="pv-stat-value">{payroll.presentDays}</div>
+                                <div className="pv-stat-label">Present</div>
+                            </div>
+                            <div className="pv-stat">
+                                <div className="pv-stat-value">{payroll.paidLeaveDays}</div>
+                                <div className="pv-stat-label">Paid Leave</div>
+                            </div>
+                            <div className="pv-stat">
+                                <div className="pv-stat-value">{payroll.nonPaidLeaveDays}</div>
+                                <div className="pv-stat-label">Non-Paid Leave</div>
+                            </div>
+                            <div className="pv-stat">
+                                <div className="pv-stat-value">{payroll.halfDayPaidDays}</div>
+                                <div className="pv-stat-label">Half-Day Paid</div>
+                            </div>
+                            <div className="pv-stat">
+                                <div className="pv-stat-value">{payroll.halfDayUnpaidDays}</div>
+                                <div className="pv-stat-label">Half-Day Unpaid</div>
+                            </div>
+                        </div>
+                    </div>
 
-                {/* Earnings Section */}
-                <div className="pv-section">
-                    <p className="pv-section-label">Earnings</p>
-                    <div className="pv-row">
-                        <span className="pv-key">Daily Salary</span>
-                        <span className="pv-val">₹{payroll.dailySalary?.toFixed(2)}</span>
-                    </div>
-                    <div className="pv-row">
-                        <span className="pv-key">Attendance Deduction</span>
-                        <span className="pv-val pv-deduction">-₹{payroll.attendanceDeduction?.toFixed(2)}</span>
-                    </div>
-                    <div className="pv-row">
-                        <span className="pv-key">Gross Earnings</span>
-                        <span className="pv-val pv-gross">₹{payroll.grossEarnings?.toFixed(2)}</span>
-                    </div>
-                </div>
+                    <div className="pv-divider"/>
 
-                <div className="pv-divider"/>
+                    {/* Earnings Section */}
+                    <div className="pv-section">
+                        <p className="pv-section-label">Earnings</p>
+                        <div className="pv-row">
+                            <span className="pv-key">Basic Pay</span>
+                            <span className="pv-val">₹{payroll.basicPay?.toFixed(2)}</span>
+                        </div>
+                        <div className="pv-row">
+                            <span className="pv-key">DA</span>
+                            <span className="pv-val">₹{payroll.da?.toFixed(2)}</span>
+                        </div>
+                        <div className="pv-row">
+                            <span className="pv-key">HRA</span>
+                            <span className="pv-val">₹{payroll.hra?.toFixed(2)}</span>
+                        </div>
+                        <div className="pv-row">
+                            <span className="pv-key">Special Allowance</span>
+                            <span className="pv-val">₹{payroll.specialAllowance?.toFixed(2)}</span>
+                        </div>
+                        <div className="pv-row">
+                            <span className="pv-key">Daily Salary</span>
+                            <span className="pv-val">₹{payroll.dailySalary?.toFixed(2)}</span>
+                        </div>
+                        <div className="pv-row">
+                            <span className="pv-key">Gross Earnings</span>
+                            <span className="pv-val pv-gross">₹{payroll.grossEarnings?.toFixed(2)}</span>
+                        </div>
+                    </div>
 
-                {/* Deductions Section */}
-                <div className="pv-section">
-                    <p className="pv-section-label">Deductions</p>
-                    <div className="pv-row">
-                        <span className="pv-key">PF</span>
-                        <span className="pv-val pv-deduction">-₹{payroll.pfDeduction?.toFixed(2)}</span>
-                    </div>
-                    <div className="pv-row">
-                        <span className="pv-key">ESIC</span>
-                        <span className="pv-val pv-deduction">-₹{payroll.esicDeduction?.toFixed(2)}</span>
-                    </div>
-                    <div className="pv-row">
-                        <span className="pv-key">Professional Tax</span>
-                        <span className="pv-val pv-deduction">-₹{payroll.professionalTax?.toFixed(2)}</span>
-                    </div>
-                    <div className="pv-row">
-                        <span className="pv-key">Income Tax</span>
-                        <span className="pv-val pv-deduction">-₹{payroll.incomeTax?.toFixed(2)}</span>
-                    </div>
-                    <div className="pv-row">
-                        <span className="pv-key">Total Deductions</span>
-                        <span className="pv-val pv-deduction">-₹{payroll.totalDeductions?.toFixed(2)}</span>
-                    </div>
-                </div>
+                    <div className="pv-divider"/>
 
-                <div className="pv-divider"/>
+                    {/* Deductions Section */}
+                    <div className="pv-section">
+                        <p className="pv-section-label">Deductions</p>
+                        <div className="pv-row">
+                            <span className="pv-key">Attendance Deduction</span>
+                            <span className="pv-val pv-deduction">-₹{payroll.attendanceDeduction?.toFixed(2)}</span>
+                        </div>
+                        <div className="pv-row">
+                            <span className="pv-key">PF</span>
+                            <span className="pv-val pv-deduction">-₹{payroll.pfDeduction?.toFixed(2)}</span>
+                        </div>
+                        <div className="pv-row">
+                            <span className="pv-key">ESIC</span>
+                            <span className="pv-val pv-deduction">-₹{payroll.esicDeduction?.toFixed(2)}</span>
+                        </div>
+                        <div className="pv-row">
+                            <span className="pv-key">Professional Tax</span>
+                            <span className="pv-val pv-deduction">-₹{payroll.professionalTax?.toFixed(2)}</span>
+                        </div>
+                        <div className="pv-row">
+                            <span className="pv-key">Income Tax</span>
+                            <span className="pv-val pv-deduction">-₹{payroll.incomeTax?.toFixed(2)}</span>
+                        </div>
+                        <div className="pv-row">
+                            <span className="pv-key">Total Deductions</span>
+                            <span className="pv-val pv-deduction">-₹{payroll.totalDeductions?.toFixed(2)}</span>
+                        </div>
+                    </div>
 
-                {/* Net Pay */}
-                <div className="pv-net-row">
-                    <span className="pv-net-label">Net Pay</span>
-                    <span className="pv-net-amount">₹{payroll.netPay?.toFixed(2)}</span>
+                    <div className="pv-divider"/>
+
+                    {/* Net Pay */}
+                    <div className="pv-net-row">
+                        <span className="pv-net-label">Net Pay</span>
+                        <span className="pv-net-amount">₹{payroll.netPay?.toFixed(2)}</span>
+                    </div>
+
                 </div>
 
                 {/* Footer */}
