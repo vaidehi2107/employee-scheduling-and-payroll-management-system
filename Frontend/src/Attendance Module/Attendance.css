@@ -319,11 +319,6 @@ tbody tr:hover {
     color: #b5680f;
 }
 
-.month-view-stats .stat-pill.half-day {
-    background: rgba(90, 110, 220, 0.1);
-    color: #4c5cc4;
-}
-
 /* ── Status badges ── */
 .status-badge {
     display: inline-block;

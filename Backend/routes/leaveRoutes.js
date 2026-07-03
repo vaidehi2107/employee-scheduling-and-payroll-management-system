@@ -5,8 +5,9 @@ import LeaveLedger from "../models/leaveLedger.js";
 import {
     assertRangeNotPayrollLocked,
     applyLeaveToAttendance,
-    removeLeaveFromAttendance
-} from "../services/syncAttendanceForLeave.js";
+    removeLeaveFromAttendance,
+    workingDatesInRange
+} from "../services/syncAttendanceforLeave.js";
 
 const router = express.Router();
 
@@ -103,6 +104,17 @@ async function getOrCreateBalance(employeeId, companyId, leaveYear) {
     return balance;
 }
 
+// Rejects if this employee already has a leave record overlapping the
+// given range, so the same day can never be double-booked with two leaves.
+async function hasOverlappingLeave(employeeId, companyId, from, to) {
+    return await Leave.findOne({
+        employeeId,
+        companyId,
+        fromDate: { $lte: to },
+        toDate: { $gte: from }
+    });
+}
+
 // ---------- apply leave ----------
 
 router.post("/", async (req, res) => {
@@ -126,6 +138,17 @@ router.post("/", async (req, res) => {
 
         if (isHalfDay && !isSameDay(from, to)) {
             return res.status(400).json({ message: "Half day leave requires the same from and to date" });
+        }
+
+        // A range that's entirely Sat/Sun has no working day to apply leave
+        // to - covers both a single weekend day and a multi-day range that
+        // happens to fall wholly on a weekend.
+        if (workingDatesInRange(from, to).length === 0) {
+            return res.status(400).json({ message: "Leave cannot be applied on weekend days" });
+        }
+
+        if (await hasOverlappingLeave(employeeId, companyId, from, to)) {
+            return res.status(409).json({ message: "A leave already exists for one or more of these dates" });
         }
 
         try {
@@ -241,131 +264,6 @@ router.get("/:empId/ledger", async (req, res) => {
 
         const ledger = await LeaveLedger.find(filter).sort({ date: -1 });
         res.status(200).json(ledger);
-    } catch (err) {
-        res.status(500).json({ message: err.message });
-    }
-});
-
-// ---------- update leave ----------
-
-router.put("/:leaveId", async (req, res) => {
-    try {
-        const { leaveId } = req.params;
-        const { fromDate, toDate, isHalfDay, reason } = req.body;
-
-        const leave = await Leave.findById(leaveId);
-        if (!leave) {
-            return res.status(404).json({ message: "Leave record not found" });
-        }
-
-        const oldTotalDays = leave.totalDays;
-        const oldYear = getLeaveYear(leave.fromDate);
-        const oldFrom = leave.fromDate;
-        const oldTo = leave.toDate;
-
-        const newFrom = fromDate ? new Date(fromDate) : leave.fromDate;
-        const newTo = toDate ? new Date(toDate) : leave.toDate;
-        const newIsHalfDay = isHalfDay !== undefined ? !!isHalfDay : leave.isHalfDay;
-
-        if (isNaN(newFrom) || isNaN(newTo) || newTo < newFrom) {
-            return res.status(400).json({ message: "Invalid date range" });
-        }
-
-        if (newIsHalfDay && !isSameDay(newFrom, newTo)) {
-            return res.status(400).json({ message: "Half day leave requires the same from and to date" });
-        }
-
-        try {
-            // Check both the range being vacated and the range being moved
-            // into - either could touch a payroll-locked date.
-            await assertRangeNotPayrollLocked(leave.employeeId, oldFrom, oldTo);
-            await assertRangeNotPayrollLocked(leave.employeeId, newFrom, newTo);
-        } catch (lockErr) {
-            return res.status(lockErr.statusCode || 403).json({ message: lockErr.message });
-        }
-
-        const newTotalDays = newIsHalfDay ? 0.5 : calculateTotalDays(newFrom, newTo);
-        const newYear = getLeaveYear(newFrom);
-        const dayDifference = newTotalDays - oldTotalDays;
-
-        // Only paid leave needs balance/ledger reconciliation
-        if (leave.leaveType === "Paid" && dayDifference !== 0) {
-            // Leave moved into a different year: reverse from old year, apply to new year
-            const oldBalance = await getOrCreateBalance(leave.employeeId, leave.companyId, oldYear);
-
-            if (oldYear === newYear) {
-                if (oldBalance.currentBalance < dayDifference) {
-                    return res.status(400).json({
-                        message: `Insufficient paid leave balance for this change. Available: ${oldBalance.currentBalance}, Additional needed: ${dayDifference}`
-                    });
-                }
-                oldBalance.totalUsed += dayDifference;
-                oldBalance.currentBalance -= dayDifference;
-                await oldBalance.save();
-
-                await LeaveLedger.create({
-                    employeeId: leave.employeeId,
-                    companyId: leave.companyId,
-                    leaveId: leave._id,
-                    date: new Date(),
-                    transactionType: dayDifference > 0 ? "DEBIT" : "CREDIT",
-                    source: "LEAVE",
-                    days: Math.abs(dayDifference),
-                    balanceAfter: oldBalance.currentBalance
-                });
-            } else {
-                // credit back all old days to old year, debit full new days from new year
-                oldBalance.totalUsed -= oldTotalDays;
-                oldBalance.currentBalance += oldTotalDays;
-                await oldBalance.save();
-
-                const newBalance = await getOrCreateBalance(leave.employeeId, leave.companyId, newYear);
-                if (newBalance.currentBalance < newTotalDays) {
-                    return res.status(400).json({
-                        message: `Insufficient paid leave balance in ${newYear}. Available: ${newBalance.currentBalance}, Requested: ${newTotalDays}`
-                    });
-                }
-                newBalance.totalUsed += newTotalDays;
-                newBalance.currentBalance -= newTotalDays;
-                await newBalance.save();
-
-                await LeaveLedger.create({
-                    employeeId: leave.employeeId,
-                    companyId: leave.companyId,
-                    leaveId: leave._id,
-                    date: new Date(),
-                    transactionType: "CREDIT",
-                    source: "LEAVE",
-                    days: oldTotalDays,
-                    balanceAfter: oldBalance.currentBalance
-                });
-                await LeaveLedger.create({
-                    employeeId: leave.employeeId,
-                    companyId: leave.companyId,
-                    leaveId: leave._id,
-                    date: new Date(),
-                    transactionType: "DEBIT",
-                    source: "LEAVE",
-                    days: newTotalDays,
-                    balanceAfter: newBalance.currentBalance
-                });
-            }
-        }
-
-        leave.fromDate = newFrom;
-        leave.toDate = newTo;
-        leave.totalDays = newTotalDays;
-        leave.isHalfDay = newIsHalfDay;
-        if (reason !== undefined) leave.reason = reason;
-        await leave.save();
-
-        // Re-sync Attendance: clear whatever the old range wrote, then
-        // write the current range/type. Doing both (rather than only the
-        // diff) keeps this correct even when leaveType or dates change.
-        await removeLeaveFromAttendance(leave.employeeId, leave.companyId, oldFrom, oldTo);
-        await applyLeaveToAttendance(leave);
-
-        res.status(200).json(leave);
     } catch (err) {
         res.status(500).json({ message: err.message });
     }

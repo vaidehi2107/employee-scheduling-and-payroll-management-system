@@ -242,12 +242,12 @@ const handleView = async(id) => {
                                             <span className="attendance-absent">{formatDays(p.absentDays)}A</span>
                                         </div>
                                     </td>
-                                    <td className="payroll-gross">₹{p.grossEarnings?.toFixed(2)}</td>
-                                    <td className="payroll-deduction">-₹{p.pfDeduction?.toFixed(2)}</td>
-                                    <td className="payroll-deduction">-₹{p.esicDeduction?.toFixed(2)}</td>
-                                    <td className="payroll-deduction">-₹{p.professionalTax?.toFixed(2)}</td>
-                                    <td className="payroll-deduction">-₹{p.incomeTax?.toFixed(2)}</td>
-                                    <td className="payroll-net">₹{p.netPay?.toFixed(2)}</td>
+                                    <td className="payroll-gross">₹{p.grossEarnings}</td>
+                                    <td className="payroll-deduction">-₹{p.pfDeduction}</td>
+                                    <td className="payroll-deduction">-₹{p.esicDeduction}</td>
+                                    <td className="payroll-deduction">-₹{p.professionalTax}</td>
+                                    <td className="payroll-deduction">-₹{p.incomeTax}</td>
+                                    <td className="payroll-net">₹{p.netPay}</td>
                                     <td>
                                         <div className="payroll-actions">
                                             <button className="p-action-btn p-view-btn" onClick={() => handleView(p._id)} title="View">

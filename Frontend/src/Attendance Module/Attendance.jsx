@@ -36,7 +36,7 @@ function Attendance(){
 
     const [employees, setEmployees] = useState([]);
     const [attendance, setAttendance] = useState([]);
-    const [summary, setSummary] = useState({ workingDays: 0, presentDays: 0, paidLeaveDays: 0, nonPaidLeaveDays: 0, halfDayDays: 0 });
+    const [summary, setSummary] = useState({ workingDays: 0, presentDays: 0, paidLeaveDays: 0, nonPaidLeaveDays: 0 });
 
     const [employeeId, setEmployeeId] = useState("");
     const [selectedMonth, setSelectedMonth] = useState(new Date());
@@ -69,7 +69,7 @@ function Attendance(){
     useEffect(() => {
         if (!employeeId) {
             setAttendance([]);
-            setSummary({ workingDays: 0, presentDays: 0, paidLeaveDays: 0, nonPaidLeaveDays: 0, halfDayDays: 0 });
+            setSummary({ workingDays: 0, presentDays: 0, paidLeaveDays: 0, nonPaidLeaveDays: 0 });
             return;
         }
         const { start, end } = getMonthRange(selectedMonth);
@@ -83,7 +83,7 @@ function Attendance(){
                 { params: { employeeId: empId, startDate: startDate.toISOString(), endDate: endDate.toISOString() } }
             );
             setAttendance(response.data.records);
-            setSummary(response.data.summary || { workingDays: 0, presentDays: 0, paidLeaveDays: 0, nonPaidLeaveDays: 0, halfDayDays: 0 });
+            setSummary(response.data.summary || { workingDays: 0, presentDays: 0, paidLeaveDays: 0, nonPaidLeaveDays: 0 });
         } catch (err) {
             console.log(err);
         }
@@ -121,12 +121,12 @@ function Attendance(){
     // status we don't specifically recognise, so unexpected values still
     // render sensibly instead of disappearing.
     const mapRecordStatus = (record) => {
+        if (record.isHalfDay && (record.status === "Paid Leave" || record.status === "Non-Paid Leave")) {
+            return "halfDay";
+        }
         switch (record.status) {
             case "Paid Leave": return "paidLeave";
             case "Non-Paid Leave": return "nonPaidLeave";
-            case "Half-Day Paid":
-            case "Half-Day Unpaid":
-                return "halfDay";
             case "Holiday": return "holiday";
             case "Week Off": return "weekOff";
             case "Present":
@@ -167,7 +167,7 @@ function Attendance(){
         upcoming: "Upcoming",
         paidLeave: "Paid Leave",
         nonPaidLeave: "Unpaid Leave",
-        halfDay: "Half-Day",
+        halfDay: "Half Day",
         holiday: "Holiday",
         weekOff: "Week Off"
     };
@@ -241,7 +241,6 @@ function Attendance(){
               <span className="stat-pill present">{summary.presentDays} Present</span>
               <span className="stat-pill paid-leave">{summary.paidLeaveDays} Paid Leave</span>
               <span className="stat-pill unpaid-leave">{summary.nonPaidLeaveDays} Unpaid Leave</span>
-              {/* <span className="stat-pill half-day">{summary.halfDayDays} Half-Day</span> */}
             </div>
           </div>
 

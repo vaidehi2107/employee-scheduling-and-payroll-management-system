@@ -21,6 +21,13 @@ const isLockedByPayroll = async (attendanceId) => {
     return !!payroll;
 };
 
+// Weekends aren't working days - attendance is never marked for them
+// (they render as "Week Off" automatically), so block create/edit outright.
+const isWeekend = (date) => {
+    const dow = date.getDay();
+    return dow === 0 || dow === 6;
+};
+
 
 //Create Attendance
 router.post("/attendance", verifyToken, async (req,res) => {
@@ -38,6 +45,10 @@ router.post("/attendance", verifyToken, async (req,res) => {
 
         attendanceDate.setHours(0, 0, 0, 0);
         joiningDate.setHours(0, 0, 0, 0);
+
+        if (isWeekend(attendanceDate)) {
+            return res.status(400).json({ message: "Attendance cannot be marked on a weekend." });
+        }
 
         if (attendanceDate < joiningDate) {
             return res.status(400).json({
@@ -148,6 +159,10 @@ router.put("/attendance/update/:id", verifyToken, async (req,res) => {
 
         attendanceDate.setHours(0, 0, 0, 0);
         joiningDate.setHours(0, 0, 0, 0);
+
+        if (isWeekend(attendanceDate)) {
+            return res.status(400).json({ message: "Attendance cannot be marked on a weekend." });
+        }
 
         if (attendanceDate < joiningDate) {
             return res.status(400).json({

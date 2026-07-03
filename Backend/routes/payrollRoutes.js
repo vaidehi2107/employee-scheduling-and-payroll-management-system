@@ -1,7 +1,6 @@
 import express from "express";
 import Tax from "../models/tax.js";
 import Payroll from "../models/payroll.js";
-import EmployeeTax from "../models/employeeTax.js";
 import Salary from "../models/salaryStructure.js";
 import Employee from "../models/employee.js";
 import { getAttendanceSummary } from "../services/getAttendanceSummary.js";
@@ -98,23 +97,13 @@ router.post("/payroll/generate", verifyToken, async (req, res) => {
 
         const annualizedEarnings = monthlyGross * 12;
 
-        // Employee-specific override first, fall back to company-wide slab
-        let taxSlab = await EmployeeTax.findOne({
-            employeeId,
+        // Company-wide tax slab (employee-level overrides no longer exist)
+        const taxSlab = await Tax.findOne({
             companyId: req.companyId,
             status: "active",
             startRange: { $lte: annualizedEarnings },
             endRange: { $gte: annualizedEarnings }
         });
-
-        if (!taxSlab) {
-            taxSlab = await Tax.findOne({
-                companyId: req.companyId,
-                status: "active",
-                startRange: { $lte: annualizedEarnings },
-                endRange: { $gte: annualizedEarnings }
-            });
-        }
 
         const annualIncomeTax = taxSlab
             ? (annualizedEarnings * taxSlab.employeePercentage) / 100

@@ -113,7 +113,7 @@ function Tax() {
             {/* HEADER */}
             <div className="tax-header">
                 <div>
-                    <h2 className="tax-title">Tax Management</h2>
+                    <h2 className="tax-title">Employee Tax Management</h2>
                     <p>Manage and configure employee tax brackets and contributions</p>
                 </div>
             </div>

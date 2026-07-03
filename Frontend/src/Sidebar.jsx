@@ -10,7 +10,7 @@ function Sidebar() {
         location.pathname === "/employees" || location.pathname === "/add-employee";
 
     // Payroll sub-routes
-    const payrollRoutes = ["/payroll", "/employee-tax-setup", "/tax"];
+    const payrollRoutes = ["/payroll", "/tax"];
     const isPayrollSectionActive = payrollRoutes.some((r) =>
         location.pathname.startsWith(r)
     );
@@ -134,44 +134,22 @@ function Sidebar() {
                         </NavLink>
 
                         <NavLink
-                            to="/employee-tax-setup"
-                            className={({ isActive }) =>
-                                isActive ? "nav-item nav-item--sub active" : "nav-item nav-item--sub"
-                            }
-                        >
-                            Employee Tax Setup
-                        </NavLink>
-
-                        <NavLink
                             to="/tax"
                             className={({ isActive }) =>
                                 isActive ? "nav-item nav-item--sub active" : "nav-item nav-item--sub"
                             }
                         >
-                            Tax Module
+                            Employee Tax Module
                         </NavLink>
                     </div>
                 )}
 
                 
-
-
-                <NavLink
-                    to="/users"
-                    className={({ isActive }) => isActive ? "nav-item active" : "nav-item"}
-                >
-                    User Management
-                </NavLink>
             </nav>
 
             {/* Bottom */}
             <div className="sidebar-bottom">
-                <NavLink
-                    to="/settings"
-                    className={({ isActive }) => isActive ? "nav-item active" : "nav-item"}
-                >
-                    Settings
-                </NavLink>
+            
 
                 <div className="user-profile">
                     <div className="user-avatar">A</div>
