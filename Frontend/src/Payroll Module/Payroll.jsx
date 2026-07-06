@@ -4,16 +4,17 @@ import DatePicker from "react-datepicker";
 import { format } from "date-fns";
 import "./Payroll.css";
 import PayrollView from "./PayrollView.jsx";
+import PayrollPreviewTable from "./PayrollPreviewTable.jsx";
 import { downloadPayrollPDF } from "./Payrollpdf.js";
+import { exportPayrollsToExcel } from "./PayrollExcel.js";
 
 function Payroll() {
 
-const [employees, setEmployees] = useState([]);
 const [payrolls, setPayrolls] = useState([]);
-const [form, setForm] = useState({
-    employeeId: "",
-    period: null // Date representing the selected pay month/year
-});
+const [period, setPeriod] = useState(null); // Date representing the selected pay month/year
+
+const [previewEmployees, setPreviewEmployees] = useState([]);
+const [previewLoading, setPreviewLoading] = useState(false);
 
 const [generating, setGenerating] = useState(false);
 const [viewPayroll, setViewPayroll] = useState(null);
@@ -34,18 +35,18 @@ const formatDays = (value) => {
 };
 
 useEffect(() => {
-    fetchEmployees();
     fetchPayrolls();
 }, []);
 
-const fetchEmployees = async() => {
-    try{
-        const res = await API.get("/emp/all");
-        setEmployees(res.data.filter(emp => emp.status?.toLowerCase() === "active"));
-    }catch(err){
-        console.error(err);
+// As soon as a pay month is picked, automatically fetch the preview for
+// every eligible employee. Clearing the month clears the preview.
+useEffect(() => {
+    if (!period) {
+        setPreviewEmployees([]);
+        return;
     }
-};
+    fetchPreview(period);
+}, [period]);
 
 const fetchPayrolls = async() => {
     try{
@@ -56,26 +57,44 @@ const fetchPayrolls = async() => {
     }
 };
 
-//handle generate
+const fetchPreview = async(selectedPeriod) => {
+    setPreviewLoading(true);
+    try{
+        const month = selectedPeriod.getMonth() + 1;
+        const year = selectedPeriod.getFullYear();
+
+        const res = await API.post("/payroll/preview", { month, year });
+        setPreviewEmployees(res.data.employees);
+    }catch(err){
+        showToast(err.response?.data?.message || "Failed to load preview.", "error");
+        setPreviewEmployees([]);
+    } finally {
+        setPreviewLoading(false);
+    }
+};
+
+//handle generate (bulk, for every employee currently in the preview)
 const handleGenerate = async() => {
-     if (!form.employeeId || !form.period)
-            return showToast("Please fill all fields.", "error");
+    if (!period)
+        return showToast("Please select a pay month.", "error");
+
+    if (previewEmployees.length === 0)
+        return showToast("No employees to generate payroll for.", "error");
 
     setGenerating(true);
     try{
+        const month = period.getMonth() + 1;
+        const year = period.getFullYear();
 
-        const month = form.period.getMonth() + 1;
-        const year = form.period.getFullYear();
+        const res = await API.post("/payroll/generate-bulk", { month, year });
 
-        const res = await API.post("/payroll/generate", {
-            employeeId: form.employeeId,
-            month,
-            year
-        });
-        
         await fetchPayrolls();
-        setForm({employeeId: "", period: null});
-        showToast("Payroll generated successfully!");
+        setPeriod(null);
+        setPreviewEmployees([]);
+
+        const { createdCount, skippedCount } = res.data;
+        const skippedNote = skippedCount ? `, ${skippedCount} skipped` : "";
+        showToast(`Generated ${createdCount} payroll${createdCount !== 1 ? "s" : ""}${skippedNote}.`);
 
     }catch(err){
         showToast(err.response?.data?.message || "Failed to generate payroll.", "error");
@@ -108,7 +127,7 @@ const handleView = async(id) => {
 
     return (
         <div className="payroll-container">
- 
+
             {/* HEADER */}
             <div className="payroll-header">
                 <div>
@@ -116,7 +135,7 @@ const handleView = async(id) => {
                     <p>Generate and manage employee payroll records</p>
                 </div>
             </div>
- 
+
             {/* GENERATE PANEL */}
             <div className="payroll-generate-panel">
                 <div className="generate-panel-label">
@@ -125,42 +144,26 @@ const handleView = async(id) => {
                     </svg>
                     Generate Payroll
                 </div>
- 
+
                 <div className="generate-panel-fields">
-                    {/* Employee */}
-                    <div className="payroll-filter-group">
-                        <label>Employee</label>
-                        <select
-                            value={form.employeeId}
-                            onChange={e => setForm({ ...form, employeeId: e.target.value })}
-                        >
-                            <option value="">Select Employee</option>
-                            {employees.map(emp => (
-                                <option key={emp._id} value={emp._id}>
-                                    {emp.firstName} {emp.lastName}
-                                </option>
-                            ))}
-                        </select>
-                    </div>
- 
                     {/* Pay Month */}
                     <div className="payroll-filter-group">
                         <label>Pay Month</label>
                         <DatePicker
-                            selected={form.period}
-                            onChange={date => setForm({ ...form, period: date })}
+                            selected={period}
+                            onChange={date => setPeriod(date)}
                             dateFormat="MMMM yyyy"
                             showMonthYearPicker
                             placeholderText="Select pay month"
                             className="payroll-date-picker"
                         />
                     </div>
- 
+
                     {/* Generate Button */}
                     <button
                         className="generate-btn"
                         onClick={handleGenerate}
-                        disabled={generating}
+                        disabled={generating || previewLoading || !period || previewEmployees.length === 0}
                     >
                         {generating ? (
                             <>
@@ -181,7 +184,16 @@ const handleView = async(id) => {
                     </button>
                 </div>
             </div>
- 
+
+            {/* PREVIEW — appears automatically once a pay month is picked */}
+            {period && (
+                <PayrollPreviewTable
+                    period={period}
+                    employees={previewEmployees}
+                    loading={previewLoading}
+                />
+            )}
+
             {/* PAYROLL HISTORY TABLE */}
             <div className="payroll-table-container">
                 <div className="payroll-table-header">
@@ -192,9 +204,24 @@ const handleView = async(id) => {
                         </svg>
                         Payroll History
                     </span>
-                    <span className="payroll-count">{payrolls.length} record{payrolls.length !== 1 ? "s" : ""}</span>
+                    <div className="payroll-header-right">
+                        <span className="payroll-count">{payrolls.length} record{payrolls.length !== 1 ? "s" : ""}</span>
+                        <button
+                            className="export-excel-btn"
+                            onClick={() => exportPayrollsToExcel(payrolls)}
+                            disabled={payrolls.length === 0}
+                            title="Export to Excel"
+                        >
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                <polyline points="7 10 12 15 17 10"/>
+                                <line x1="12" y1="15" x2="12" y2="3"/>
+                            </svg>
+                            Export to Excel
+                        </button>
+                    </div>
                 </div>
- 
+
                 <table className="payroll-table">
                     <thead>
                         <tr>
@@ -218,7 +245,7 @@ const handleView = async(id) => {
                                         <rect x="2" y="7" width="20" height="14" rx="2"/>
                                         <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
                                     </svg>
-                                    <p>No payroll records yet. Generate one above.</p>
+                                    <p>No payroll records yet. Select a pay month above to generate.</p>
                                 </td>
                             </tr>
                         ) : (
@@ -280,7 +307,7 @@ const handleView = async(id) => {
                     </tbody>
                 </table>
             </div>
- 
+
             {/* VIEW MODAL */}
             {viewPayroll && (
                 <PayrollView
@@ -289,7 +316,7 @@ const handleView = async(id) => {
                     onDownload={() => downloadPayrollPDF(viewPayroll)}
                 />
             )}
- 
+
             {/* TOAST */}
             {toast && (
                 <div className={`payroll-toast payroll-toast-${toast.type}`}>

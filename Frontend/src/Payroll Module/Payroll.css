@@ -152,6 +152,11 @@
     overflow-x: auto;
 }
 
+.payroll-preview-panel {
+    margin-bottom: 24px;
+    border: 1.5px dashed #d8cdf0;
+}
+
 .payroll-table-header {
     display: flex;
     justify-content: space-between;
@@ -174,6 +179,38 @@
     font-size: 12px;
     color: #aaa;
     font-weight: 500;
+}
+
+.payroll-header-right {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.export-excel-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    background: rgba(45, 122, 79, 0.08);
+    color: #2d7a4f;
+    border: 1.5px solid rgba(45, 122, 79, 0.2);
+    border-radius: 8px;
+    font-size: 12.5px;
+    font-weight: 600;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.15s;
+}
+
+.export-excel-btn:hover:not(:disabled) {
+    background: rgba(45, 122, 79, 0.16);
+    transform: translateY(-1px);
+}
+
+.export-excel-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
 }
 
 /* ── Table ── */

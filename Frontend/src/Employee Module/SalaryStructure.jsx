@@ -239,27 +239,14 @@ function SalaryStructure() {
           </div>
 
           {/* ── Summary ── */}
-          <div className="form-section salary-summary">
+  
 
-            <div className="summary-row">
-              <span className="summary-label">Gross Earnings</span>
-              <span className="summary-value">₹{grossEarnings.toLocaleString("en-IN")}</span>
-            </div>
-            <div className="summary-row">
-              <span className="summary-label">Total Deductions</span>
-              <span className="summary-value summary-deduction">−₹{totalDeductions.toLocaleString("en-IN")}</span>
-            </div>
-            <div className="summary-row summary-net">
-              <span className="summary-label">Net Pay</span>
-              <span className="summary-value">₹{netPay.toLocaleString("en-IN")}</span>
-            </div>
             {remainderNegative && (
               <p className="salary-warning">
                 Basic Pay + DA + HRA exceed the negotiated salary by ₹{Math.abs(specialAllowance).toLocaleString("en-IN")}.
               </p>
             )}
-          </div>
-
+  
           <div className="form-footer">
             <button type="button" className="btn-cancel" onClick={() => navigate(-1)}>
               Cancel
