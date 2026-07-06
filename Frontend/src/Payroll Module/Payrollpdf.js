@@ -70,8 +70,6 @@ export const downloadPayrollPDF = (payroll) => {
     y = row("Present Days", `${payroll.presentDays}`, y);
     y = row("Paid Leave", `${payroll.paidLeaveDays}`, y);
     y = row("Non-Paid Leave", `${payroll.nonPaidLeaveDays}`, y);
-    y = row("Half-Day (Paid)", `${payroll.halfDayPaidDays}`, y);
-    y = row("Half-Day (Unpaid)", `${payroll.halfDayUnpaidDays}`, y);
     y += 4;
 
     doc.line(20, y, 190, y);

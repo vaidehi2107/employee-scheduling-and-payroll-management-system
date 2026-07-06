@@ -281,23 +281,6 @@
     background: rgba(124, 92, 191, 0.05);
 }
 
-/* ── Badges ── */
-.payroll-tax-badge {
-    display: inline-block;
-    padding: 3px 10px;
-    background: rgba(124, 92, 191, 0.1);
-    color: #7c5cbf;
-    border-radius: 20px;
-    font-size: 12px;
-    font-weight: 700;
-}
-
-.payroll-no-tax {
-    font-size: 12px;
-    color: #f59e0b;
-    font-style: italic;
-}
-
 /* ── Empty row ── */
 .payroll-empty-row {
     text-align: center !important;
@@ -481,7 +464,7 @@
 /* ── Compact attendance stat grid (replaces a long list of rows) ── */
 .pv-stat-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(4, 1fr);
     gap: 10px;
     margin-bottom: 4px;
 }
@@ -522,26 +505,6 @@
 
 .pv-gross { color: #2d7a4f; }
 .pv-deduction { color: #dc3545; }
-.pv-employer { color: #7c5cbf; }
-
-.pv-tax-badge {
-    display: inline-block;
-    padding: 2px 10px;
-    background: rgba(124, 92, 191, 0.1);
-    color: #7c5cbf;
-    border-radius: 20px;
-    font-size: 12px;
-    font-weight: 700;
-}
-
-.pv-no-tax {
-    display: flex;
-    align-items: center;
-    gap: 7px;
-    font-size: 13px;
-    color: #f59e0b;
-    padding: 6px 0;
-}
 
 .pv-divider {
     height: 1px;

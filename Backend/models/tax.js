@@ -2,11 +2,6 @@ import mongoose from "mongoose";
 
 const taxSchema = new mongoose.Schema({
 
-    taxCode: {
-        type: String,
-        required: true,
-        // unique: true
-    },
     companyId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Company",
@@ -43,5 +38,4 @@ const taxSchema = new mongoose.Schema({
         timestamps: true
     });
 
-    taxSchema.index({ taxCode: 1, companyId: 1 }, { unique: true });
 export default mongoose.model("Tax", taxSchema);

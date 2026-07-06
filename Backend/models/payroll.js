@@ -23,10 +23,6 @@ const payrollSchema = new mongoose.Schema({
         required: true
     },
 
-    // Calendar bounds of the pay period. attendanceRoutes.js and
-    // syncAttendanceforLeave.js both query on these fields to block edits
-    // to attendance/leave once payroll has been generated for a date - so
-    // these must be set whenever a Payroll doc is created.
     periodStart: {
         type: Date,
         required: true
@@ -58,27 +54,11 @@ const payrollSchema = new mongoose.Schema({
         default: 0
     },
 
-    halfDayPaidDays: {
-        type: Number,
-        default: 0
-    },
-
-    halfDayUnpaidDays: {
-        type: Number,
-        default: 0
-    },
-
-    // Unpaid units in whole-day equivalents (nonPaidLeaveDays +
-    // halfDayUnpaidDays * 0.5) - what attendanceDeduction was actually
-    // computed against.
     absentDays: {
         type: Number,
         default: 0
     },
 
-    // Salary Breakdown (captured from SalaryStructure at generation time,
-    // so the payslip reflects what was actually paid even if the salary
-    // structure changes later)
     basicPay: {
         type: Number,
         default: 0

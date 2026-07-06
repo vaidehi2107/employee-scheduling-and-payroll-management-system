@@ -26,8 +26,8 @@ const showToast = (message, type="success") => {
     setTimeout(() => setToast(null), 2000);
 };
 
-// absentDays can be fractional (e.g. 1.5) since Half-Day Unpaid counts as
-// half a day. Only show decimals when there actually are any.
+// absentDays can be fractional (e.g. 1.5) since a half-day unpaid record
+// counts as half a day. Only show decimals when there actually are any.
 const formatDays = (value) => {
     if (value === undefined || value === null) return "—";
     return Number.isInteger(value) ? value : value.toFixed(1);

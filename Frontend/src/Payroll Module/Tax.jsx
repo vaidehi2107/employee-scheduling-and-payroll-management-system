@@ -4,7 +4,6 @@ import "./Tax.css";
 
 function Tax() {
     const emptyTax = {
-        taxCode: "",
         startRange: "",
         endRange: "",
         employeePercentage: "",
@@ -42,7 +41,6 @@ function Tax() {
     const handleAddTax = async () => {
         try {
             const payload = {
-                taxCode: taxForm.taxCode,
                 startRange: Number(taxForm.startRange),
                 endRange: Number(taxForm.endRange),
                 employeePercentage: Number(taxForm.employeePercentage),
@@ -60,7 +58,6 @@ function Tax() {
 
     const handelEditTax = (tax) => {
         setTaxForm({
-            taxCode: tax.taxCode,
             startRange: tax.startRange,
             endRange: tax.endRange,
             employeePercentage: tax.employeePercentage,
@@ -74,7 +71,6 @@ function Tax() {
     const handleUpdateTax = async () => {
         try {
             const payload = {
-                taxCode: taxForm.taxCode,
                 startRange: Number(taxForm.startRange),
                 endRange: Number(taxForm.endRange),
                 employeePercentage: Number(taxForm.employeePercentage),
@@ -142,10 +138,6 @@ function Tax() {
                 {showTaxForm && (
                     <div className="tax-form-row">
                         <div className="tax-form-group">
-                            <label>Tax Code</label>
-                            <input name="taxCode" value={taxForm.taxCode} onChange={handleTaxChange} placeholder="e.g. TX01" />
-                        </div>
-                        <div className="tax-form-group">
                             <label>Start Range </label>
                             <input name="startRange" value={taxForm.startRange} onChange={handleTaxChange} placeholder="0" />
                         </div>
@@ -188,7 +180,6 @@ function Tax() {
                     <table className="tax-table">
                         <thead>
                             <tr>
-                                <th>Tax Code</th>
                                 <th>Range</th>
                                 <th>Employee %</th>
                                 <th>Employer Contribution %</th>
@@ -199,7 +190,6 @@ function Tax() {
                         <tbody>
                             {taxes.map(tax => (
                                 <tr key={tax._id} className={editingTaxId === tax._id ? "tax-row-editing" : ""}>
-                                    <td>{tax.taxCode}</td>
                                     <td>₹{(tax.startRange ?? 0).toLocaleString("en-IN")} – ₹{(tax.endRange ?? 0).toLocaleString("en-IN")}</td>
                                     <td><span className="tax-badge">{tax.employeePercentage}%</span></td>
                                     <td><span className="tax-badge">{tax.employerContribution}%</span></td>

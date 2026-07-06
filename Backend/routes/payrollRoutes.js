@@ -55,10 +55,7 @@ router.post("/payroll/generate", verifyToken, async (req, res) => {
             workingDays,
             presentDays,
             paidLeaveDays,
-            nonPaidLeaveDays,
-            halfDayPaidDays,
-            halfDayUnpaidDays,
-            unpaidUnits
+            nonPaidLeaveDays
         } = await getAttendanceSummary(
             employeeId,
             req.companyId,
@@ -67,12 +64,10 @@ router.post("/payroll/generate", verifyToken, async (req, res) => {
             periodEnd
         );
 
-        // absentDays is kept as the name of the deduction-driving figure for
-        // backward compatibility with the schema/UI, but it's now a
-        // whole-day-equivalent count: full Non-Paid Leave days (and unmarked
-        // working days) count as 1, Half-Day Unpaid counts as 0.5.
-        // Half-Day Paid and Paid Leave are fully paid, so they don't reduce it.
-        const absentDays = unpaidUnits;
+        // nonPaidLeaveDays already carries any half-day fractions (0.5 for
+        // a half unpaid day) baked in at the attendance-summary level, so
+        // it doubles directly as the deduction-driving figure.
+        const absentDays = nonPaidLeaveDays;
 
         // 4. Daily salary based on total calendar days in the month (not working days)
         const totalDaysInMonth = new Date(year, month, 0).getDate();
@@ -134,8 +129,6 @@ router.post("/payroll/generate", verifyToken, async (req, res) => {
             presentDays,
             paidLeaveDays,
             nonPaidLeaveDays,
-            halfDayPaidDays,
-            halfDayUnpaidDays,
             absentDays,
             basicPay,
             da,
@@ -153,7 +146,7 @@ router.post("/payroll/generate", verifyToken, async (req, res) => {
         });
 
         await payroll.save();
-        res.json({ ...payroll.toObject(), employerContribution, taxCode: taxSlab?.taxCode });
+        res.json({ ...payroll.toObject(), employerContribution });
 
     } catch (err) {
         res.status(500).json({ message: err.message });

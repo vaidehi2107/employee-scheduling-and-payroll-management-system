@@ -82,7 +82,7 @@
 /* ── Inline add/edit form ── */
 .tax-form-row {
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr auto;
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr auto;
     gap: 14px;
     align-items: flex-end;
     background: #f5f4fc;
@@ -189,8 +189,8 @@
     table-layout: fixed;
 }
 
-.tax-table th:nth-child(2),
-.tax-table td:nth-child(2) { width: 260px; }  /* Range */
+.tax-table th:nth-child(1),
+.tax-table td:nth-child(1) { width: 260px; }  /* Range */
 
 .tax-table thead tr {
     background: #f5f4fc;

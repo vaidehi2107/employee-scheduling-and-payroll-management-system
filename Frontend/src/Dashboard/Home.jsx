@@ -32,7 +32,8 @@ function Home() {
             const allEmployees = empRes.data;
             const activeEmployees = allEmployees.filter(e => e.status?.toLowerCase() === "active");
             const payrolls = payrollRes.data;
-            const attendance = attendanceRes.data;
+            // /attendance/filter returns { records, summary }, not a bare array
+            const attendance = attendanceRes.data.records || [];
 
             // Pending payrolls = payrolls generated this month
             const now = new Date();

@@ -52,14 +52,6 @@ function PayrollView({ payroll, onClose, onDownload }) {
                                 <div className="pv-stat-value">{payroll.nonPaidLeaveDays}</div>
                                 <div className="pv-stat-label">Non-Paid Leave</div>
                             </div>
-                            <div className="pv-stat">
-                                <div className="pv-stat-value">{payroll.halfDayPaidDays}</div>
-                                <div className="pv-stat-label">Half-Day Paid</div>
-                            </div>
-                            <div className="pv-stat">
-                                <div className="pv-stat-value">{payroll.halfDayUnpaidDays}</div>
-                                <div className="pv-stat-label">Half-Day Unpaid</div>
-                            </div>
                         </div>
                     </div>
 
