@@ -2,106 +2,288 @@ import API from "../api.js";
 import { useState, useEffect } from "react";
 import "./Tax.css";
 
+const emptySlabRow = () => ({
+    _key: crypto.randomUUID(),
+    startRange: "",
+    endRange: "",
+    employeePercentage: ""
+});
+
+const FY_PATTERN = /^\d{4}-\d{2}$/;
+
 function Tax() {
-    const emptyTax = {
-        startRange: "",
-        endRange: "",
-        employeePercentage: "",
-        employerContribution: "",
-        status: "active"
-    };
+    const [years, setYears] = useState([]);
+    const [selectedYear, setSelectedYear] = useState("");
+    const [viewSlabs, setViewSlabs] = useState({ old: [], new: [] });
+    const [loading, setLoading] = useState(false);
 
-    const [taxes, setTaxes] = useState([]);
-    const [taxForm, setTaxForm] = useState(emptyTax);
-    const [showTaxForm, setShowTaxForm] = useState(false);
-    const [editingTaxId, setEditingTaxId] = useState(null);
-
-    const [confirmDeleteId, setConfirmDeleteId] = useState(null);
+    // Draft (add / copy) workflow state — nothing here touches the server
+    // until "Confirm & Save" is clicked.
+    const [showAddPanel, setShowAddPanel] = useState(false);
+    const [draftMode, setDraftMode] = useState(null); // "blank" | "copy" | null
+    const [copySourceYear, setCopySourceYear] = useState("");
+    const [draftYear, setDraftYear] = useState("");
+    const [draftSlabs, setDraftSlabs] = useState({ old: [emptySlabRow()], new: [emptySlabRow()] });
+    const [formError, setFormError] = useState("");
+    const [saving, setSaving] = useState(false);
 
     useEffect(() => {
-        fetchTaxes();
+        fetchYears();
     }, []);
 
-    const fetchTaxes = async () => {
+    const fetchYears = async () => {
         try {
-            const res = await API.get("/tax/all");
-            setTaxes(res.data);
+            const res = await API.get("/tax/years");
+            setYears(res.data);
+            if (res.data.length > 0) {
+                setSelectedYear(res.data[0]);
+            }
         } catch (err) {
             console.error(err);
         }
     };
 
-    const handleTaxChange = (e) => {
-        setTaxForm(prev => ({
+    useEffect(() => {
+        if (selectedYear) {
+            fetchYearData(selectedYear);
+        }
+    }, [selectedYear]);
+
+    const fetchYearData = async (year) => {
+        setLoading(true);
+        try {
+            const res = await API.get(`/tax/all?year=${encodeURIComponent(year)}`);
+            const old = res.data.find(d => d.regime === "old");
+            const newer = res.data.find(d => d.regime === "new");
+            setViewSlabs({
+                old: old ? old.slabs : [],
+                new: newer ? newer.slabs : []
+            });
+        } catch (err) {
+            console.error(err);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // ── Draft workflow ──
+
+    const openAddPanel = () => {
+        setShowAddPanel(true);
+        setDraftMode(null);
+        setDraftYear("");
+        setCopySourceYear("");
+        setFormError("");
+    };
+
+    const startBlankDraft = () => {
+        setDraftMode("blank");
+        setDraftSlabs({ old: [emptySlabRow()], new: [emptySlabRow()] });
+    };
+
+    const startCopyDraft = async (sourceYear) => {
+        setCopySourceYear(sourceYear);
+        try {
+            const res = await API.get(`/tax/all?year=${encodeURIComponent(sourceYear)}`);
+            const old = res.data.find(d => d.regime === "old");
+            const newer = res.data.find(d => d.regime === "new");
+            const cloneSlabs = (slabs) => (slabs && slabs.length > 0
+                ? slabs.map(s => ({
+                    _key: crypto.randomUUID(),
+                    startRange: s.startRange,
+                    endRange: s.endRange,
+                    employeePercentage: s.employeePercentage
+                }))
+                : [emptySlabRow()]);
+            setDraftSlabs({
+                old: cloneSlabs(old?.slabs),
+                new: cloneSlabs(newer?.slabs)
+            });
+            setDraftMode("copy");
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
+    const handleDraftYearChange = (e) => {
+        setDraftYear(e.target.value);
+        setFormError("");
+    };
+
+    const handleSlabFieldChange = (regime, key, field, value) => {
+        setDraftSlabs(prev => ({
             ...prev,
-            [e.target.name]: e.target.value
+            [regime]: prev[regime].map(row => row._key === key ? { ...row, [field]: value } : row)
         }));
     };
 
-    const handleAddTax = async () => {
+    const addSlabRow = (regime) => {
+        setDraftSlabs(prev => ({
+            ...prev,
+            [regime]: [...prev[regime], emptySlabRow()]
+        }));
+    };
+
+    const removeSlabRow = (regime, key) => {
+        setDraftSlabs(prev => ({
+            ...prev,
+            [regime]: prev[regime].filter(row => row._key !== key)
+        }));
+    };
+
+    const cancelDraft = () => {
+        setShowAddPanel(false);
+        setDraftMode(null);
+        setDraftYear("");
+        setCopySourceYear("");
+        setFormError("");
+    };
+
+    const validateDraft = () => {
+        if (!FY_PATTERN.test(draftYear)) {
+            return "Enter the financial year like 2027-28";
+        }
+        if (years.includes(draftYear)) {
+            return `Tax slabs for ${draftYear} already exist`;
+        }
+        for (const regime of ["old", "new"]) {
+            const rows = draftSlabs[regime];
+            if (rows.length === 0) {
+                return `Add at least one ${regime} regime slab`;
+            }
+            for (let i = 0; i < rows.length; i++) {
+                const row = rows[i];
+                const isLastRow = i === rows.length - 1;
+                if (row.startRange === "" || row.employeePercentage === "") {
+                    return `Fill in all fields for the ${regime} regime slabs`;
+                }
+                // endRange is optional only on the last row (open-ended top slab, e.g. "24,00,000 and above")
+                if (!isLastRow && row.endRange === "") {
+                    return `Fill in end range for ${regime} regime slab ${i + 1}`;
+                }
+            }
+        }
+        return "";
+    };
+
+    const handleConfirmSave = async () => {
+        const error = validateDraft();
+        if (error) {
+            setFormError(error);
+            return;
+        }
+        setSaving(true);
         try {
             const payload = {
-                startRange: Number(taxForm.startRange),
-                endRange: Number(taxForm.endRange),
-                employeePercentage: Number(taxForm.employeePercentage),
-                employerContribution: Number(taxForm.employerContribution),
-                status: taxForm.status
+                financialYear: draftYear,
+                regimes: ["old", "new"].map(regime => ({
+                    regime,
+                    slabs: draftSlabs[regime].map(row => ({
+                        startRange: Number(row.startRange),
+                        endRange: row.endRange === "" ? null : Number(row.endRange),
+                        employeePercentage: Number(row.employeePercentage)
+                    }))
+                }))
             };
-            const res = await API.post("/tax/add", payload);
-            setTaxes(prev => [...prev, res.data]);
-            setTaxForm(emptyTax);
-            setShowTaxForm(false);
+            await API.post("/tax/add", payload);
+            await fetchYears();
+            setSelectedYear(draftYear);
+            cancelDraft();
         } catch (err) {
-            console.error(err);
+            setFormError(err.response?.data?.message || "Something went wrong while saving");
+        } finally {
+            setSaving(false);
         }
     };
 
-    const handelEditTax = (tax) => {
-        setTaxForm({
-            startRange: tax.startRange,
-            endRange: tax.endRange,
-            employeePercentage: tax.employeePercentage,
-            employerContribution: tax.employerContribution,
-            status: tax.status
-        });
-        setEditingTaxId(tax._id);
-        setShowTaxForm(true);
-    };
-    
-    const handleUpdateTax = async () => {
-        try {
-            const payload = {
-                startRange: Number(taxForm.startRange),
-                endRange: Number(taxForm.endRange),
-                employeePercentage: Number(taxForm.employeePercentage),
-                employerContribution: Number(taxForm.employerContribution),
-                status: taxForm.status
-            };
-            const res = await API.put(`/tax/update/${editingTaxId}`, payload);
-            setTaxes(prev => prev.map(t => t._id === editingTaxId ? res.data : t));
-            setEditingTaxId(null);
-            setTaxForm(emptyTax);
-            setShowTaxForm(false);
-        } catch (err) {
-            console.error(err);
-        }
-    };
+    const renderSlabTable = (regimeLabel, slabs) => (
+        <div className="tax-regime-section">
+            <div className="tax-regime-title">{regimeLabel}</div>
+            {slabs.length > 0 ? (
+                <table className="tax-table">
+                    <thead>
+                        <tr>
+                            <th>Range</th>
+                            <th>Employee %</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {slabs.map((slab, i) => (
+                            <tr key={slab._id || i}>
+                                <td>
+                                    ₹{(slab.startRange ?? 0).toLocaleString("en-IN")}
+                                    {" – "}
+                                    {slab.endRange == null ? "and above" : `₹${slab.endRange.toLocaleString("en-IN")}`}
+                                </td>
+                                <td><span className="tax-badge">{slab.employeePercentage}%</span></td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            ) : (
+                <div className="tax-empty-small">No slabs defined</div>
+            )}
+        </div>
+    );
 
-    const handleDeleteTax = async (id) => {
-        try {
-            await API.delete(`/tax/delete/${id}`);
-            setTaxes(prev => prev.filter(t => t._id !== id));
-            setConfirmDeleteId(null);
-        } catch (err) {
-            console.error(err);
-        }
-    };
-
-    const handleCancelTax = () => {
-        setTaxForm(emptyTax);
-        setEditingTaxId(null);
-        setShowTaxForm(false);
-    };
+    const renderDraftSlabTable = (regime, regimeLabel) => (
+        <div className="tax-regime-section">
+            <div className="tax-regime-title">{regimeLabel}</div>
+            <table className="tax-table tax-draft-table">
+                <thead>
+                    <tr>
+                        <th>Start Range</th>
+                        <th>End Range</th>
+                        <th>Employee %</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {draftSlabs[regime].map((row, i) => {
+                        const isLastRow = i === draftSlabs[regime].length - 1;
+                        return (
+                        <tr key={row._key}>
+                            <td>
+                                <input
+                                    value={row.startRange}
+                                    onChange={e => handleSlabFieldChange(regime, row._key, "startRange", e.target.value)}
+                                    placeholder="0"
+                                />
+                            </td>
+                            <td>
+                                <input
+                                    value={row.endRange}
+                                    onChange={e => handleSlabFieldChange(regime, row._key, "endRange", e.target.value)}
+                                    placeholder={isLastRow ? "no limit" : "0"}
+                                />
+                            </td>
+                            <td>
+                                <input
+                                    value={row.employeePercentage}
+                                    onChange={e => handleSlabFieldChange(regime, row._key, "employeePercentage", e.target.value)}
+                                    placeholder="0"
+                                />
+                            </td>
+                            <td>
+                                <button
+                                    type="button"
+                                    className="tax-icon-btn tax-remove-slab-btn"
+                                    onClick={() => removeSlabRow(regime, row._key)}
+                                    title="Remove slab"
+                                >
+                                    ×
+                                </button>
+                            </td>
+                        </tr>
+                        );
+                    })}
+                </tbody>
+            </table>
+            <button type="button" className="btn-add-slab-row" onClick={() => addSlabRow(regime)}>
+                + Add Slab
+            </button>
+        </div>
+    );
 
     return (
         <div className="tax-container">
@@ -110,7 +292,7 @@ function Tax() {
             <div className="tax-header">
                 <div>
                     <h2 className="tax-title">Employee Tax Management</h2>
-                    <p>Manage and configure employee tax brackets and contributions</p>
+                    <p>Manage year-wise old and new regime tax slabs</p>
                 </div>
             </div>
 
@@ -119,137 +301,115 @@ function Tax() {
 
                 <div className="tax-section-title">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <line x1="12" y1="1" x2="12" y2="23"/>
-                        <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+                        <line x1="12" y1="1" x2="12" y2="23" />
+                        <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
                     </svg>
                     Tax Module
-                    {!showTaxForm && (
-                        <button type="button" className="btn-add-tax" onClick={() => setShowTaxForm(true)}>
+
+                    {!showAddPanel && years.length > 0 && (
+                        <select
+                            className="tax-year-select"
+                            value={selectedYear}
+                            onChange={e => setSelectedYear(e.target.value)}
+                        >
+                            {years.map(y => <option key={y} value={y}>{y}</option>)}
+                        </select>
+                    )}
+
+                    {!showAddPanel && (
+                        <button type="button" className="btn-add-tax" onClick={openAddPanel}>
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                                <line x1="12" y1="5" x2="12" y2="19"/>
-                                <line x1="5" y1="12" x2="19" y2="12"/>
+                                <line x1="12" y1="5" x2="12" y2="19" />
+                                <line x1="5" y1="12" x2="19" y2="12" />
                             </svg>
-                            Add Record
+                            Add Financial Year
                         </button>
                     )}
                 </div>
 
-                {/* Inline add/edit form */}
-                {showTaxForm && (
-                    <div className="tax-form-row">
+                {/* Step 1: choose blank vs copy */}
+                {showAddPanel && draftMode === null && (
+                    <div className="tax-add-panel">
                         <div className="tax-form-group">
-                            <label>Start Range </label>
-                            <input name="startRange" value={taxForm.startRange} onChange={handleTaxChange} placeholder="0" />
+                            <label>New Financial Year</label>
+                            <input value={draftYear} onChange={handleDraftYearChange} placeholder="e.g. 2027-28" />
                         </div>
-                        <div className="tax-form-group">
-                            <label>End Range </label>
-                            <input name="endRange" value={taxForm.endRange} onChange={handleTaxChange} placeholder="0" />
-                        </div>
-                        <div className="tax-form-group">
-                            <label>Employee %</label>
-                            <input name="employeePercentage" value={taxForm.employeePercentage} onChange={handleTaxChange} placeholder="0" />
-                        </div>
-                        <div className="tax-form-group">
-                            <label>Employer Contribution %</label>
-                            <input name="employerContribution" value={taxForm.employerContribution} onChange={handleTaxChange} placeholder="0" />
-                        </div>
-                        <div className="tax-form-group">
-                            <label>Status</label>
-                            <select name="status" value={taxForm.status} onChange={handleTaxChange} className="tax-select">
-                                <option value="active">Active</option>
-                                <option value="inactive">Inactive</option>
-                            </select>
-                        </div>
-                        <div className="tax-form-actions">
-                            <button
-                                type="button"
-                                className="btn-tax-save"
-                                onClick={editingTaxId ? handleUpdateTax : handleAddTax}
-                            >
-                                {editingTaxId ? "Update" : "Save"}
+
+                        <div className="tax-add-panel-choices">
+                            <button type="button" className="btn-tax-save" onClick={startBlankDraft}>
+                                Start Blank
                             </button>
-                            <button type="button" className="btn-tax-cancel" onClick={handleCancelTax}>
+
+                            {years.length > 0 && (
+                                <div className="tax-copy-choice">
+                                    <span>or copy from</span>
+                                    <select
+                                        className="tax-year-select"
+                                        value={copySourceYear}
+                                        onChange={e => e.target.value && startCopyDraft(e.target.value)}
+                                        defaultValue=""
+                                    >
+                                        <option value="" disabled>Select year</option>
+                                        {years.map(y => <option key={y} value={y}>{y}</option>)}
+                                    </select>
+                                </div>
+                            )}
+                        </div>
+
+                        {formError && <div className="tax-form-error">{formError}</div>}
+
+                        <button type="button" className="btn-tax-cancel" onClick={cancelDraft}>
+                            Cancel
+                        </button>
+                    </div>
+                )}
+
+                {/* Step 2: preview / edit the draft, then confirm */}
+                {showAddPanel && draftMode !== null && (
+                    <div className="tax-draft-panel">
+                        <div className="tax-draft-banner">
+                            Previewing <strong>{draftYear || "new year"}</strong>
+                            {draftMode === "copy" && <> — copied from <strong>{copySourceYear}</strong>, edit as needed</>}
+                            {" "}before saving. Nothing is saved yet.
+                        </div>
+
+                        {renderDraftSlabTable("old", "Old Regime")}
+                        {renderDraftSlabTable("new", "New Regime")}
+
+                        {formError && <div className="tax-form-error">{formError}</div>}
+
+                        <div className="tax-form-actions tax-draft-actions">
+                            <button type="button" className="btn-tax-save" onClick={handleConfirmSave} disabled={saving}>
+                                {saving ? "Saving..." : "Confirm & Save"}
+                            </button>
+                            <button type="button" className="btn-tax-cancel" onClick={cancelDraft}>
                                 Cancel
                             </button>
                         </div>
                     </div>
                 )}
 
-                {/* Tax table */}
-                {taxes.length > 0 ? (
-                    <table className="tax-table">
-                        <thead>
-                            <tr>
-                                <th>Range</th>
-                                <th>Employee %</th>
-                                <th>Employer Contribution %</th>
-                                <th>Status</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {taxes.map(tax => (
-                                <tr key={tax._id} className={editingTaxId === tax._id ? "tax-row-editing" : ""}>
-                                    <td>₹{(tax.startRange ?? 0).toLocaleString("en-IN")} – ₹{(tax.endRange ?? 0).toLocaleString("en-IN")}</td>
-                                    <td><span className="tax-badge">{tax.employeePercentage}%</span></td>
-                                    <td><span className="tax-badge">{tax.employerContribution}%</span></td>
-                                    <td>
-                                        <span className={`tax-status-badge ${tax.status}`}>
-                                            {tax.status}
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <div className="tax-actions-cell">
-                                            <button type="button" className="tax-icon-btn tax-edit-btn" onClick={() => handelEditTax(tax)} title="Edit">
-                                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
-                                                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
-                                                </svg>
-                                            </button>
-                                            <button type="button" className="tax-icon-btn tax-delete-btn" onClick={() => setConfirmDeleteId(tax._id)} title="Delete">
-                                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                                    <polyline points="3 6 5 6 21 6"/>
-                                                    <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
-                                                    <path d="M10 11v6"/><path d="M14 11v6"/>
-                                                    <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
-                                                </svg>
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                ) : (
-                    !showTaxForm && (
+                {/* Read-only view of the selected year */}
+                {!showAddPanel && (
+                    loading ? (
+                        <div className="tax-empty"><p>Loading...</p></div>
+                    ) : years.length === 0 ? (
                         <div className="tax-empty">
                             <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#ccc" strokeWidth="1.5">
-                                <line x1="12" y1="1" x2="12" y2="23"/>
-                                <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+                                <line x1="12" y1="1" x2="12" y2="23" />
+                                <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
                             </svg>
-                            <p>No tax records added yet</p>
+                            <p>No tax slabs added yet</p>
                         </div>
+                    ) : (
+                        <>
+                            {renderSlabTable("Old Regime", viewSlabs.old)}
+                            {renderSlabTable("New Regime", viewSlabs.new)}
+                        </>
                     )
                 )}
 
             </div>
-            {/* DELETE CONFIRMATION */}
-            {confirmDeleteId && (
-                <div className="confirm-overlay">
-                    <div className="confirm-dialog">
-                        <h4>Delete Tax Record?</h4>
-                        <p>This action cannot be undone.</p>
-                        <div className="confirm-actions">
-                            <button className="btn-confirm-delete" onClick={() => handleDeleteTax(confirmDeleteId)}>
-                                Delete
-                            </button>
-                            <button className="btn-confirm-cancel" onClick={() => setConfirmDeleteId(null)}>
-                                Cancel
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
         </div>
     );
 }

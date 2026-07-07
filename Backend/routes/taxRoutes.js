@@ -1,30 +1,68 @@
 import express from "express";
+import mongoose from "mongoose";
 import Tax from "../models/tax.js";
+
 import { verifyToken } from "../middleware.js";
 
 const router = express.Router();
 
 //post - add and save to db 
-router.post("/tax/add", verifyToken, async (req,res) => {
- 
-    try{
-        const tax = new Tax({ ...req.body, companyId: req.companyId });
-        const savedTax = await tax.save();
-        res.json(savedTax);
+router.post("/tax/add", verifyToken, async (req, res) => {
+    const session = await mongoose.startSession();
+    try {
+        const { financialYear, regimes } = req.body;
 
-    } catch(err){
-        console.log("Full error:", err); 
-        res.status(500).json({message: err.message});
-    } 
+        if (!financialYear || !Array.isArray(regimes) || regimes.length === 0) {
+            return res.status(400).json({ message: "financialYear and regimes are required" });
+        }
+
+        const docsToInsert = regimes.map(r => ({
+            companyId: req.companyId,
+            financialYear,
+            regime: r.regime,
+            slabs: r.slabs
+        }));
+
+        let savedDocs;
+        await session.withTransaction(async () => {
+            savedDocs = await Tax.insertMany(docsToInsert, { session, ordered: true });
+        });
+
+        res.json(savedDocs);
+    } catch (err) {
+        console.log(err);
+        if (err.code === 11000) {
+            return res.status(409).json({ message: `Tax slabs for ${req.body.financialYear} already exist` });
+        }
+        res.status(500).json({ message: err.message });
+    } finally {
+        session.endSession();
+    }
 });
 
-//get all records
+//get all records - if year is specified than only that year's record is shown
 router.get("/tax/all", verifyToken, async(req,res) => {
     try{
-        const taxes = await Tax.find({ companyId: req.companyId });
+        const filter = {companyId: req.companyId};
+        if(req.query.year){
+            filter.financialYear = req.query.year;
+        }
+        const taxes = await Tax.find(filter).sort({regime: 1});
         res.json(taxes);
     }catch(err){
         res.status(500).json({message: err.message});
+    }
+});
+
+//get years for the dropdown - 
+// like aa company na ketla years no record che to etla years dropdown ma show krse
+router.get("/tax/years", verifyToken, async (req,res) => {
+    try{
+        const years = await Tax.distinct("financialYear", { companyId: req.companyId });
+        years.sort().reverse();
+        res.json(years);
+    }catch(err){
+        res.status(500).json({message: err,message});
     }
 });
 
