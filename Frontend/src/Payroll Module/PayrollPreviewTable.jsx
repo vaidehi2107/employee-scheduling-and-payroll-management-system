@@ -55,12 +55,12 @@ function PayrollPreviewTable({ period, employees, loading }) {
                                     <span>{emp.firstName} {emp.lastName}</span>
                                 </td>
                                 <td className="payroll-gross">₹{emp.grossEarnings?.toFixed(2)}</td>
-                                <td className="payroll-deduction">-₹{emp.attendanceDeduction?.toFixed(2)}</td>
-                                <td className="payroll-deduction">-₹{emp.pfDeduction?.toFixed(2)}</td>
-                                <td className="payroll-deduction">-₹{emp.esicDeduction?.toFixed(2)}</td>
-                                <td className="payroll-deduction">-₹{emp.professionalTax?.toFixed(2)}</td>
-                                <td className="payroll-deduction">-₹{emp.incomeTax?.toFixed(2)}</td>
-                                <td className="payroll-deduction">-₹{emp.totalDeductions?.toFixed(2)}</td>
+                                <td className="payroll-deduction">₹{emp.attendanceDeduction?.toFixed(2)}</td>
+                                <td className="payroll-deduction">₹{emp.pfDeduction?.toFixed(2)}</td>
+                                <td className="payroll-deduction">₹{emp.esicDeduction?.toFixed(2)}</td>
+                                <td className="payroll-deduction">₹{emp.professionalTax?.toFixed(2)}</td>
+                                <td className="payroll-deduction">₹{emp.incomeTax?.toFixed(2)}</td>
+                                <td className="payroll-deduction">₹{emp.totalDeductions?.toFixed(2)}</td>
                                 <td className="payroll-net">₹{emp.netPay?.toFixed(2)}</td>
                             </tr>
                         ))}

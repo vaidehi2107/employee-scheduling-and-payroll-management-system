@@ -10,7 +10,7 @@ function Sidebar() {
         location.pathname === "/employees" || location.pathname === "/add-employee";
 
     // Payroll sub-routes
-    const payrollRoutes = ["/payroll", "/tax"];
+    const payrollRoutes = ["/payroll", "/payroll-history", "/tax"];
     const isPayrollSectionActive = payrollRoutes.some((r) =>
         location.pathname.startsWith(r)
     );
@@ -126,11 +126,21 @@ function Sidebar() {
                     <div className="nav-submenu">
                         <NavLink
                             to="/payroll"
+                            end
                             className={({ isActive }) =>
                                 isActive ? "nav-item nav-item--sub active" : "nav-item nav-item--sub"
                             }
                         >
                             Run Payroll
+                        </NavLink>
+
+                        <NavLink
+                            to="/payroll-history"
+                            className={({ isActive }) =>
+                                isActive ? "nav-item nav-item--sub active" : "nav-item nav-item--sub"
+                            }
+                        >
+                            Payroll History
                         </NavLink>
 
                         <NavLink

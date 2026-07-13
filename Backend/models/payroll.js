@@ -22,6 +22,17 @@ const payrollSchema = new mongoose.Schema({
         type: Number, // e.g. 2026
         required: true
     },
+    
+    financialYear: {
+        type: String,
+        required: true
+    },
+
+    taxRegimeUsed: {
+        type: String,
+        enum: ["old", "new"],
+        required: true
+    },
 
     periodStart: {
         type: Date,

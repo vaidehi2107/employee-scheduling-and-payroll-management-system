@@ -1,4 +1,5 @@
 import express from "express";
+import mongoose from "mongoose";
 import Tax from "../models/tax.js";
 import Payroll from "../models/payroll.js";
 import Salary from "../models/salaryStructure.js";
@@ -9,11 +10,23 @@ import { verifyToken } from "../middleware.js";
 const router = express.Router();
 
 async function computePayrollForEmployee(employeeId, companyId, month, year) {
-    // 1. Fetch employee's salary structure
-    const salary = await Salary.findOne({ employeeId, companyId });
+    // Financial year for this payroll period (Apr–Mar cycle)
+    const financialYear = month >= 4
+        ? `${year}-${String(year + 1).slice(-2)}`
+        : `${year - 1}-${String(year).slice(-2)}`;
+
+    // 1. Fetch employee's salary structure — must match this financial year
+    const salary = await Salary.findOne({ employeeId, companyId, financialYear });
     if (!salary) {
         return { ok: false, reason: "no_salary_structure" };
     }
+
+    // Tax regime must be explicitly selected on the salary structure before
+    // payroll can be generated (defaults to null until chosen)
+    if (!salary.taxRegime) {
+        return { ok: false, reason: "no_tax_regime_selected" };
+    }
+    const taxRegimeUsed = salary.taxRegime;
 
     // 2. Fetch employee (needed for joiningDate + display name)
     const employee = await Employee.findOne({ _id: employeeId, companyId });
@@ -69,22 +82,23 @@ async function computePayrollForEmployee(employeeId, companyId, month, year) {
     // 7. Income Tax annual.
     const annualizedEarnings = monthlyGross * 12;
 
-    // Company-wide tax slab (employee-level overrides no longer exist)
-    const taxSlab = await Tax.findOne({
-        companyId,
-        status: "active",
-        startRange: { $lte: annualizedEarnings },
-        endRange: { $gte: annualizedEarnings }
-    });
+    // Company-wide tax slab table for this FY + the employee's chosen regime
+    const taxDoc = await Tax.findOne({ companyId, financialYear, regime: taxRegimeUsed });
 
-    const annualIncomeTax = taxSlab
-        ? (annualizedEarnings * taxSlab.employeePercentage) / 100
-        : 0;
-    const incomeTax = parseFloat((annualIncomeTax / 12).toFixed(2));
+    let incomeTax = 0;
+    // NOTE: employerContribution isn't a field on the Tax schema yet.
+    // Add it (top-level or per-slab) if you need it reported here.
+    let employerContribution = 0;
 
-    const employerContribution = taxSlab
-        ? parseFloat(((annualizedEarnings * taxSlab.employerContribution) / 100 / 12).toFixed(2))
-        : 0;
+    if (taxDoc) {
+        const slab = taxDoc.slabs.find(s =>
+            annualizedEarnings >= s.startRange &&
+            (s.endRange == null || annualizedEarnings <= s.endRange)
+        );
+        if (slab) {
+            incomeTax = parseFloat(((annualizedEarnings * slab.employeePercentage) / 100 / 12).toFixed(2));
+        }
+    }
 
     // 8. Total Deductions
     const totalDeductions = parseFloat(
@@ -100,6 +114,8 @@ async function computePayrollForEmployee(employeeId, companyId, month, year) {
             companyId,
             month,
             year,
+            financialYear,
+            taxRegimeUsed,
             periodStart,
             periodEnd,
             workingDays,
@@ -146,10 +162,13 @@ router.post("/payroll/generate", verifyToken, async (req, res) => {
         const result = await computePayrollForEmployee(employeeId, req.companyId, month, year);
 
         if (!result.ok) {
-            const message = result.reason === "no_salary_structure"
-                ? "Salary structure not found for employee"
-                : "Employee not found";
-            return res.status(404).json({ message });
+            const messages = {
+                no_salary_structure: "Salary structure not found for employee for this financial year",
+                no_tax_regime_selected: "Tax regime (old/new) has not been selected for this employee",
+                no_employee: "Employee not found",
+                not_yet_joined: "Employee had not yet joined during this pay period"
+            };
+            return res.status(404).json({ message: messages[result.reason] || "Unable to compute payroll" });
         }
 
         const payroll = new Payroll(result.data);
@@ -278,13 +297,70 @@ router.post("/payroll/generate-bulk", verifyToken, async (req, res) => {
     }
 });
 
-// GET Payroll all
+// GET Payroll all — supports optional year / employeeId filters (combinable)
+// and pagination. Pass limit=all to bypass pagination and get every matching
+// record in one go (used by the Excel export, which should export everything
+// matching the current filters, not just the visible page).
 router.get("/payroll/all", verifyToken, async (req, res) => {
     try {
-        const payrolls = await Payroll.find({ companyId: req.companyId })
+        const { financialYear, employeeId, page = 1, limit = 10 } = req.query;
+
+        const filter = { companyId: req.companyId };
+
+        if (financialYear) {
+            filter.financialYear = financialYear;
+        }
+
+        if (employeeId) {
+            if (!mongoose.Types.ObjectId.isValid(employeeId)) {
+                return res.status(400).json({ message: "Invalid employeeId" });
+            }
+            filter.employeeId = employeeId;
+        }
+
+        const totalRecords = await Payroll.countDocuments(filter);
+
+        let query = Payroll.find(filter)
             .populate("employeeId", "firstName lastName")
             .sort({ createdAt: -1 });
-        res.json(payrolls);
+
+        const wantsAll = limit === "all";
+        const pageNum = Math.max(1, parseInt(page, 10) || 1);
+        const limitNum = wantsAll ? totalRecords || 1 : Math.max(1, parseInt(limit, 10) || 10);
+
+        if (!wantsAll) {
+            query = query.skip((pageNum - 1) * limitNum).limit(limitNum);
+        }
+
+        const payrolls = await query;
+
+        res.json({
+            payrolls,
+            totalRecords,
+            totalPages: wantsAll ? 1 : Math.max(1, Math.ceil(totalRecords / limitNum)),
+            currentPage: wantsAll ? 1 : pageNum
+        });
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+});
+
+// GET filter options for Payroll History — distinct years and the distinct
+// set of employees that actually have at least one payroll record, so the
+// dropdowns never offer a combination guaranteed to return nothing.
+router.get("/payroll/filters", verifyToken, async (req, res) => {
+    try {
+        const companyId = req.companyId;
+
+        const financialYears = await Payroll.distinct("financialYear", { companyId });
+        financialYears.sort().reverse(); // "2026-27" sorts correctly as a string, newest first
+
+        const employeeIds = await Payroll.distinct("employeeId", { companyId });
+        const employees = await Employee.find({ _id: { $in: employeeIds } })
+            .select("firstName lastName")
+            .sort({ firstName: 1, lastName: 1 });
+
+        res.json({ financialYears, employees });
     } catch (err) {
         res.status(500).json({ message: err.message });
     }

@@ -7,7 +7,8 @@ import Topbar from "./Topbar";
 import Sidebar from "./Sidebar";
 import Attendance from "./Attendance Module/Attendance";
 import Tax from "./Payroll Module/Tax";
-import Payroll from "./Payroll Module/Payroll";
+import RunPayroll from "./Payroll Module/RunPayroll";
+import PayrollHistory from "./Payroll Module/PayrollHistory";
 import AdminSidebar from "./Admin Module/AdminSidebar";
 import AdminDashboard from "./Admin Module/AdminDashboard";
 import Companies from "./Admin Module/Companies";
@@ -80,7 +81,8 @@ function App() {
                     <Route path="/departments" element={<Department />} />
                     <Route path="/attendance" element={<Attendance />} />
                     <Route path="/tax" element={<Tax />} />
-                    <Route path="/payroll" element={<Payroll />} />
+                    <Route path="/payroll" element={<RunPayroll />} />
+                    <Route path="/payroll-history" element={<PayrollHistory />} />
         
                     <Route path="/salary/:employeeId" element={<SalaryStructure />} />
                     
