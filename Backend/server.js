@@ -14,6 +14,7 @@ import jobApplicationRoutes from "./routes/jobApplicationRoutes.js";
 import publicRecruitmentRoutes from "./routes/publicRecruitmentRoutes.js";
 import salaryRoutes from "./routes/salaryRoutes.js";
 import leaveRoutes from "./routes/leaveRoutes.js"; 
+import dashboardRoutes from "./routes/dashboardRoutes.js";
 
 const app = express();
 const PORT = 5000;
@@ -33,6 +34,7 @@ app.use("/api", jobApplicationRoutes);
 app.use("/api/public", publicRecruitmentRoutes);
 app.use("/api", salaryRoutes);
 app.use("/api/leaves", leaveRoutes);
+app.use("/api", dashboardRoutes);
 
 app.get("/", (req,res)=> {
     res.send("Hello World!");

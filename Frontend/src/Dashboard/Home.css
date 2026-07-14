@@ -139,7 +139,7 @@
 /* ── Red badge variant ── */
 .dash-badge.red { background: #fef0f0; color: #e05252; }
 
-/* ── Absent section ── */
+/* ── Section ── */
 .dash-section {
     background: #ffffff;
     border-radius: 16px;
@@ -169,78 +169,6 @@
 }
 
 .dash-section-title svg { color: #e05c5c; }
-
-.dash-absent-count {
-    font-size: 12px;
-    font-weight: 600;
-    padding: 3px 10px;
-    border-radius: 20px;
-    background: rgba(224, 92, 92, 0.1);
-    color: #e05c5c;
-}
-
-/* ── Absent cards grid ── */
-.dash-absent-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-    gap: 12px;
-}
-
-.dash-absent-card {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 12px 14px;
-    border-radius: 12px;
-    border: 1px solid #f0f0f8;
-    background: #fafafe;
-    transition: box-shadow 0.2s;
-}
-
-.dash-absent-card:hover {
-    box-shadow: 0 4px 12px rgba(100, 80, 180, 0.08);
-}
-
-.dash-absent-avatar {
-    width: 38px;
-    height: 38px;
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 12px;
-    font-weight: 700;
-    flex-shrink: 0;
-}
-
-.dash-absent-info { flex: 1; min-width: 0; }
-
-.dash-absent-name {
-    font-size: 13px;
-    font-weight: 600;
-    color: #1a1a2e;
-    margin: 0 0 2px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.dash-absent-sub {
-    font-size: 11px;
-    color: #aaa;
-    margin: 0;
-}
-
-.dash-absent-badge {
-    font-size: 10px;
-    font-weight: 600;
-    padding: 3px 8px;
-    border-radius: 20px;
-    background: rgba(224, 92, 92, 0.1);
-    color: #e05c5c;
-    white-space: nowrap;
-    flex-shrink: 0;
-}
 
 /* ── Empty state ── */
 .dash-empty {

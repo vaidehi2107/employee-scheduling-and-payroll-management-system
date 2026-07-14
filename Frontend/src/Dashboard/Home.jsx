@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import API from "../api.js";
 import "./Home.css";
+import AttendanceDailyChart from "./AttendanceDailyChart.jsx";
 
 function Home() {
     const [stats, setStats] = useState({
@@ -9,7 +10,6 @@ function Home() {
         pendingPayrolls: 0,
         totalEmployees: 0,
     });
-    const [absentEmployees, setAbsentEmployees] = useState([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -18,38 +18,39 @@ function Home() {
 
     const fetchDashboardData = async () => {
         try {
-            const [empRes, payrollRes, attendanceRes] = await Promise.all([
+            const now = new Date();
+            const [empRes, payrollRes, dailyRes] = await Promise.all([
                 API.get("/emp/all"),
-                API.get("/payroll/all"),
-                API.get("/attendance/filter", {
-                    params: {
-                        startDate: new Date(new Date().getFullYear(), new Date().getMonth(), 1),
-                        endDate: new Date(),
-                    }
+                API.get("/payroll/all", { params: { limit: "all" } }),
+                API.get("/dashboard/attendance/daily-summary", {
+                    params: { month: now.getMonth() + 1, year: now.getFullYear() }
                 })
             ]);
 
             const allEmployees = empRes.data;
             const activeEmployees = allEmployees.filter(e => e.status?.toLowerCase() === "active");
-            const payrolls = payrollRes.data;
-            // /attendance/filter returns { records, summary }, not a bare array
-            const attendance = attendanceRes.data.records || [];
+            // /payroll/all returns { payrolls, totalRecords, totalPages, currentPage }, not a bare array
+            const payrolls = payrollRes.data.payrolls || [];
+            // /dashboard/attendance/daily-summary returns { days }, same shape the chart uses
+            const days = dailyRes.data.days || [];
 
             // Pending payrolls = payrolls generated this month
-            const now = new Date();
             const thisMonthPayrolls = payrolls.filter(p => {
                 const d = new Date(p.periodEnd);
                 return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
             });
 
-            // Attendance rate = unique active employees who have attended this month / total active
-            const presentIds = new Set(attendance.map(a => a.employeeId?._id || a.employeeId));
-            const attendanceRate = activeEmployees.length > 0
-                ? Math.round((presentIds.size / activeEmployees.length) * 100)
+            // Attendance rate = average of each working day's present rate,
+            // same calculation the daily chart is built from (not just
+            // "attended at least once this month", which hides partial absences)
+            const workingDays = days.filter(d => !d.isNonWorkingDay);
+            const dayRate = d => {
+                const total = d.present + d.paidLeave + d.nonPaidLeave;
+                return total > 0 ? (d.present / total) * 100 : 100;
+            };
+            const attendanceRate = workingDays.length > 0
+                ? Math.round(workingDays.reduce((sum, d) => sum + dayRate(d), 0) / workingDays.length)
                 : 0;
-
-            // Absent employees = active employees with NO attendance record this month
-            const absentList = activeEmployees.filter(e => !presentIds.has(e._id));
 
             setStats({
                 totalActive: activeEmployees.length,
@@ -57,7 +58,6 @@ function Home() {
                 attendanceRate,
                 pendingPayrolls: thisMonthPayrolls.length,
             });
-            setAbsentEmployees(absentList);
         } catch (err) {
             console.error(err);
         } finally {
@@ -65,20 +65,9 @@ function Home() {
         }
     };
 
-    const getInitials = (firstName = "", lastName = "") =>
-        (firstName[0] || "") + (lastName[0] || "");
-
-    const AVATAR_COLORS = [
-        { bg: "#e6f1fb", color: "#185fa5" },
-        { bg: "#e1f5ee", color: "#0f6e56" },
-        { bg: "#faeeda", color: "#854f0b" },
-        { bg: "#eeedfe", color: "#534ab7" },
-        { bg: "#fbeaf0", color: "#993556" },
-    ];
-    const avatarColor = (name = "") =>
-        AVATAR_COLORS[(name.charCodeAt(0) || 0) % AVATAR_COLORS.length];
-
     const monthName = new Date().toLocaleString("default", { month: "long", year: "numeric" });
+    const currentMonth = new Date().getMonth() + 1; // 1-12, matches backend's month convention
+    const currentYear = new Date().getFullYear();
 
     return (
         <div className="dash-page">
@@ -130,7 +119,7 @@ function Home() {
                     <div className="dash-bar">
                         <div className="dash-bar-fill" style={{ width: `${stats.attendanceRate}%` }}/>
                     </div>
-                    <p className="dash-meta">{loading ? "" : `${absentEmployees.length} absent this month`}</p>
+                    <p className="dash-meta">{loading ? "" : "Average attendance this month"}</p>
                 </div>
 
                 {/* Payroll */}
@@ -174,50 +163,20 @@ function Home() {
 
             </div>
 
-            {/* Absent Employees This Month */}
+            {/* Daily Attendance Breakdown */}
             <div className="dash-section">
                 <div className="dash-section-header">
                     <div className="dash-section-title">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                            <circle cx="12" cy="12" r="10"/>
-                            <line x1="12" y1="8" x2="12" y2="12"/>
-                            <line x1="12" y1="16" x2="12.01" y2="16"/>
+                            <rect x="3" y="4" width="18" height="18" rx="2"/>
+                            <line x1="16" y1="2" x2="16" y2="6"/>
+                            <line x1="8" y1="2" x2="8" y2="6"/>
+                            <line x1="3" y1="10" x2="21" y2="10"/>
                         </svg>
-                        Employees with No Attendance — {monthName}
+                        Daily Attendance — {monthName}
                     </div>
-                    {!loading && (
-                        <span className="dash-absent-count">{absentEmployees.length} employee{absentEmployees.length !== 1 ? "s" : ""}</span>
-                    )}
                 </div>
-
-                {loading ? (
-                    <div className="dash-empty">Loading...</div>
-                ) : absentEmployees.length === 0 ? (
-                    <div className="dash-empty">
-                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#c8c4e8" strokeWidth="1.5">
-                            <polyline points="20 6 9 17 4 12"/>
-                        </svg>
-                        <p>All active employees have attendance records this month.</p>
-                    </div>
-                ) : (
-                    <div className="dash-absent-grid">
-                        {absentEmployees.map((emp) => {
-                            const av = avatarColor(emp.firstName);
-                            return (
-                                <div className="dash-absent-card" key={emp._id}>
-                                    <div className="dash-absent-avatar" style={{ background: av.bg, color: av.color }}>
-                                        {getInitials(emp.firstName, emp.lastName)}
-                                    </div>
-                                    <div className="dash-absent-info">
-                                        <p className="dash-absent-name">{emp.firstName} {emp.lastName}</p>
-                                        <p className="dash-absent-sub">{emp.physicalAddress?.city || "—"}</p>
-                                    </div>
-                                    <span className="dash-absent-badge">No Records</span>
-                                </div>
-                            );
-                        })}
-                    </div>
-                )}
+                <AttendanceDailyChart month={currentMonth} year={currentYear} />
             </div>
 
         </div>
