@@ -33,6 +33,17 @@ function Sidebar() {
     const toggleRecruitment = () => setRecruitmentOpen((prev) => !prev);
 
 
+    // Reports sub-routes
+    const reportsRoutes = ["/reports/payroll", "/reports/leave"];
+    const isReportsSectionActive = reportsRoutes.some((r) =>
+        location.pathname.startsWith(r)
+    );
+    // Keep submenu open if a reports route is active, else respect toggle
+    const [reportsOpen, setReportsOpen] = useState(isReportsSectionActive);
+
+    const toggleReports = () => setReportsOpen((prev) => !prev);
+
+
     return (
         <aside className="sidebar">
 
@@ -150,6 +161,40 @@ function Sidebar() {
                             }
                         >
                             Employee Tax Module
+                        </NavLink>
+                    </div>
+                )}
+
+                {/* ── Reports (parent toggle) ── */}
+                <button
+                    className={`nav-item nav-item--parent ${isReportsSectionActive ? "active" : ""}`}
+                    onClick={toggleReports}
+                    aria-expanded={reportsOpen}
+                >
+                    <span>Reports</span>
+                    <span className={`nav-arrow ${reportsOpen ? "nav-arrow--open" : ""}`}>
+                        ▾
+                    </span>
+                </button>
+
+                {reportsOpen && (
+                    <div className="nav-submenu">
+                        <NavLink
+                            to="/reports/payroll"
+                            className={({ isActive }) =>
+                                isActive ? "nav-item nav-item--sub active" : "nav-item nav-item--sub"
+                            }
+                        >
+                            Payroll Report
+                        </NavLink>
+
+                        <NavLink
+                            to="/reports/leave"
+                            className={({ isActive }) =>
+                                isActive ? "nav-item nav-item--sub active" : "nav-item nav-item--sub"
+                            }
+                        >
+                            Leave Report
                         </NavLink>
                     </div>
                 )}

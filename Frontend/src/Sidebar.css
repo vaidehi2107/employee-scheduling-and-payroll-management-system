@@ -45,6 +45,34 @@
 /* ── Nav ── */
 .sidebar-nav {
     flex: 1;
+    min-height: 0;       /* required for overflow to work inside a flex column */
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding-right: 4px;  /* keeps content clear of the scrollbar */
+}
+
+/* Thin, unobtrusive scrollbar - only visible when actually scrollable */
+.sidebar-nav::-webkit-scrollbar {
+    width: 4px;
+}
+
+.sidebar-nav::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.sidebar-nav::-webkit-scrollbar-thumb {
+    background: rgba(124, 92, 191, 0.25);
+    border-radius: 4px;
+}
+
+.sidebar-nav::-webkit-scrollbar-thumb:hover {
+    background: rgba(124, 92, 191, 0.45);
+}
+
+/* Firefox */
+.sidebar-nav {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(124, 92, 191, 0.25) transparent;
 }
 
 .nav-label {

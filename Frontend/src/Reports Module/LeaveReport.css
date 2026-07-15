@@ -1,0 +1,284 @@
+.leave-report-page {
+    font-family: 'DM Sans', sans-serif;
+    padding: 8px 4px 32px;
+    color: #1a1a2e;
+}
+
+/* ── Header ── */
+.leave-report-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.leave-report-title {
+    font-size: 24px;
+    font-weight: 700;
+    color: #1a1a2e;
+    margin: 0 0 4px;
+}
+
+.leave-report-subtitle {
+    font-size: 13px;
+    color: #888;
+    margin: 0;
+}
+
+.leave-report-actions {
+    display: flex;
+    gap: 10px;
+}
+
+/* ── Buttons ── */
+.leave-btn {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 10px 16px;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s, opacity 0.2s;
+}
+
+.leave-btn--outline {
+    background: #ffffff;
+    color: #7c5cbf;
+    border: 1px solid rgba(124, 92, 191, 0.35);
+}
+
+.leave-btn--outline:hover:not(:disabled) {
+    background: rgba(124, 92, 191, 0.08);
+}
+
+.leave-btn--outline:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* ── Filters ── */
+.leave-report-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    background: #f5f5ff;
+    border-radius: 14px;
+    padding: 16px 20px;
+    margin-bottom: 24px;
+}
+
+.leave-filter-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 160px;
+}
+
+.leave-filter-field label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: #888;
+}
+
+.leave-filter-field select {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    color: #1a1a2e;
+    padding: 9px 12px;
+    border-radius: 8px;
+    border: 1px solid rgba(124, 92, 191, 0.25);
+    background: #ffffff;
+    cursor: pointer;
+}
+
+.leave-filter-field select:focus {
+    outline: 2px solid #7c5cbf;
+    outline-offset: 1px;
+}
+
+/* ── Error ── */
+.leave-report-error {
+    background: #fdeeee;
+    color: #b3261e;
+    border: 1px solid #f3c6c4;
+    border-radius: 10px;
+    padding: 12px 16px;
+    font-size: 13px;
+    margin-bottom: 20px;
+}
+
+/* ── Summary cards ── */
+.leave-summary-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+    gap: 14px;
+    margin-bottom: 28px;
+}
+
+.leave-summary-card {
+    background: #ffffff;
+    border: 1px solid rgba(124, 92, 191, 0.15);
+    border-radius: 14px;
+    padding: 16px 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    box-shadow: 0 2px 8px rgba(92, 63, 163, 0.06);
+}
+
+.leave-summary-card--accent {
+    background: rgba(124, 92, 191, 0.06);
+    border-color: rgba(124, 92, 191, 0.25);
+}
+
+.leave-summary-card--highlight {
+    background: linear-gradient(135deg, #7c5cbf, #5c3fa3);
+    border: none;
+}
+
+.leave-summary-card--highlight .leave-summary-label,
+.leave-summary-card--highlight .leave-summary-value {
+    color: #ffffff;
+}
+
+.leave-summary-label {
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    color: #888;
+}
+
+.leave-summary-value {
+    font-size: 20px;
+    font-weight: 700;
+    color: #1a1a2e;
+}
+
+.leave-summary-hint {
+    font-size: 11px;
+    color: #999;
+}
+
+/* ── Table ── */
+.leave-report-table-wrapper {
+    overflow-x: auto;
+    border: 1px solid rgba(124, 92, 191, 0.15);
+    border-radius: 14px;
+    background: #ffffff;
+}
+
+.leave-report-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+
+.leave-report-table thead th {
+    text-align: center;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: #888;
+    background: #f5f5ff;
+    padding: 12px 16px;
+    position: sticky;
+    top: 0;
+}
+
+.leave-report-table tbody td {
+    padding: 12px 16px;
+    border-top: 1px solid rgba(124, 92, 191, 0.1);
+    color: #3a3a5c;
+}
+
+.leave-report-row:hover {
+    background: rgba(124, 92, 191, 0.04);
+}
+
+.leave-report-table-name {
+    font-weight: 600;
+    color: #1a1a2e;
+}
+
+.leave-report-table-total {
+    font-weight: 700;
+    color: #5c3fa3;
+}
+
+.leave-report-table-empty {
+    text-align: center;
+    padding: 32px 16px;
+    color: #999;
+    font-style: italic;
+    white-space: normal;
+}
+
+/* ── Expand control ── */
+.leave-expand-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 12px;
+    color: #7c5cbf;
+    padding: 4px 6px;
+    line-height: 1;
+}
+
+/* ── Expanded detail sub-table ── */
+.leave-detail-row td {
+    background: #faf9ff;
+    padding: 0 16px 16px !important;
+    border-top: none !important;
+}
+
+.leave-detail-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+    margin-top: 4px;
+    border: 1px solid rgba(124, 92, 191, 0.12);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.leave-detail-table thead th {
+    text-align: center;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    color: #999;
+    background: #f0eefc;
+    padding: 8px 12px;
+}
+
+.leave-detail-table tbody td {
+    padding: 8px 12px;
+    color: #3a3a5c;
+    border-top: 1px solid rgba(124, 92, 191, 0.08);
+}
+
+.leave-type-badge {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 6px;
+}
+
+.leave-type-badge--paid {
+    background: rgba(45, 122, 79, 0.1);
+    color: #2d7a4f;
+}
+
+.leave-type-badge--nonpaid {
+    background: rgba(220, 53, 69, 0.1);
+    color: #dc3545;
+}

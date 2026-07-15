@@ -2,6 +2,7 @@ import express from "express";
 import Leave from "../models/leaves.js";
 import LeaveBalance from "../models/leaveBalance.js";
 import LeaveLedger from "../models/leaveLedger.js";
+import { verifyToken } from "../middleware.js";
 import {
     assertRangeNotPayrollLocked,
     applyLeaveToAttendance,
@@ -117,7 +118,7 @@ async function hasOverlappingLeave(employeeId, companyId, from, to) {
 
 // ---------- apply leave ----------
 
-router.post("/", async (req, res) => {
+router.post("/", verifyToken, async (req, res) => {
     try {
         const { employeeId, companyId, leaveType, fromDate, toDate, isHalfDay, reason } = req.body;
 
@@ -211,7 +212,7 @@ router.post("/", async (req, res) => {
 
 // ---------- get all leave records of an employee ----------
 
-router.get("/:empId", async (req, res) => {
+router.get("/:empId", verifyToken, async (req, res) => {
     try {
         const { empId } = req.params;
         const { year } = req.query;
@@ -231,7 +232,7 @@ router.get("/:empId", async (req, res) => {
 
 // ---------- get paid leave balance ----------
 
-router.get("/:empId/balance", async (req, res) => {
+router.get("/:empId/balance", verifyToken, async (req, res) => {
     try {
         const { empId } = req.params;
         const { companyId, year } = req.query;
@@ -251,7 +252,7 @@ router.get("/:empId/balance", async (req, res) => {
 
 // ---------- get leave ledger ----------
 
-router.get("/:empId/ledger", async (req, res) => {
+router.get("/:empId/ledger", verifyToken, async (req, res) => {
     try {
         const { empId } = req.params;
         const { year } = req.query;
@@ -271,7 +272,7 @@ router.get("/:empId/ledger", async (req, res) => {
 
 // ---------- delete leave ----------
 
-router.delete("/:leaveId", async (req, res) => {
+router.delete("/:leaveId", verifyToken, async (req, res) => {
     try {
         const { leaveId } = req.params;
 

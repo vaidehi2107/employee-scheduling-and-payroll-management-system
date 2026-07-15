@@ -22,6 +22,8 @@ import JobApplication from "./Recruitment Module/JobApplications";
 import PublicJobListings from "./Recruitment Module/Public Pages/PublicJobListings";
 import PublicJobDetail from "./Recruitment Module/Public Pages/PublicJobDetail";
 import SalaryStructure from "./Employee Module/SalaryStructure";
+import PayrollReport from "./Reports Module/PayrollReport";
+import LeaveReport from "./Reports Module/LeaveReport";
 
 function AppLayout() {
     return (
@@ -83,6 +85,9 @@ function App() {
                     <Route path="/tax" element={<Tax />} />
                     <Route path="/payroll" element={<RunPayroll />} />
                     <Route path="/payroll-history" element={<PayrollHistory />} />
+
+                    <Route path="/reports/payroll" element={<PayrollReport />} />
+                    <Route path="/reports/leave" element={<LeaveReport />} />
         
                     <Route path="/salary/:employeeId" element={<SalaryStructure />} />
                     
