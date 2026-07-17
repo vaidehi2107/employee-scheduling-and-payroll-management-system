@@ -1,5 +1,6 @@
 import Attendance from "../models/attendance.js";
 import Payroll from "../models/payroll.js";
+import { getHolidayMap } from "./holidayHelper.js";
 
 const MS_PER_DAY = 1000 * 60 * 60 * 24;
 
@@ -8,10 +9,12 @@ const LEAVE_STATUS = {
     NonPaid: "Non-Paid Leave"
 };
 
-// Every calendar day in [fromDate, toDate], inclusive, skipping weekends.
-// Weekends already render as "Week Off" in the UI regardless of any
-// Attendance record, so there's nothing useful to write for them.
-export function workingDatesInRange(fromDate, toDate) {
+// Every calendar day in [fromDate, toDate], inclusive, skipping weekends
+// and holidays. Weekends already render as "Week Off" and holidays render
+// as "Holiday" in the UI regardless of any Attendance record, so there's
+// nothing useful to write for either - a leave day here shouldn't burn a
+// leave entitlement or overwrite a holiday.
+export async function workingDatesInRange(companyId, fromDate, toDate) {
     const dates = [];
     for (let cursor = new Date(fromDate); cursor <= toDate; cursor = new Date(cursor.getTime() + MS_PER_DAY)) {
         const day = new Date(cursor);
@@ -19,14 +22,18 @@ export function workingDatesInRange(fromDate, toDate) {
         const dow = day.getDay();
         if (dow !== 0 && dow !== 6) dates.push(day);
     }
-    return dates;
+
+    if (dates.length === 0) return dates;
+
+    const holidayByDate = await getHolidayMap(companyId, dates[0], dates[dates.length - 1]);
+    return dates.filter(day => !holidayByDate.has(day.toDateString()));
 }
 
 // Throws a 403 if payroll has already been generated for any working day in
 // the range, so a leave apply/edit/delete can never silently rewrite
 // attendance a payroll run already relied on.
-export async function assertRangeNotPayrollLocked(employeeId, fromDate, toDate) {
-    const dates = workingDatesInRange(fromDate, toDate);
+export async function assertRangeNotPayrollLocked(employeeId, companyId, fromDate, toDate) {
+    const dates = await workingDatesInRange(companyId, fromDate, toDate);
     if (dates.length === 0) return;
 
     const locked = await Payroll.findOne({
@@ -56,7 +63,7 @@ export async function assertRangeNotPayrollLocked(employeeId, fromDate, toDate) 
 export async function applyLeaveToAttendance(leave) {
     const status = LEAVE_STATUS[leave.leaveType];
     const isHalfDay = !!leave.isHalfDay;
-    const dates = workingDatesInRange(leave.fromDate, leave.toDate);
+    const dates = await workingDatesInRange(leave.companyId, leave.fromDate, leave.toDate);
 
     await Promise.all(dates.map((date) =>
         Attendance.findOneAndUpdate(
@@ -77,7 +84,7 @@ export async function applyLeaveToAttendance(leave) {
 // status now) are touched, so this never clobbers a record that was since
 // manually edited (e.g. back to "Present").
 export async function removeLeaveFromAttendance(employeeId, companyId, fromDate, toDate) {
-    const dates = workingDatesInRange(fromDate, toDate);
+    const dates = await workingDatesInRange(companyId, fromDate, toDate);
     if (dates.length === 0) return;
 
     await Attendance.deleteMany({

@@ -141,11 +141,11 @@ router.post("/", verifyToken, async (req, res) => {
             return res.status(400).json({ message: "Half day leave requires the same from and to date" });
         }
 
-        // A range that's entirely Sat/Sun has no working day to apply leave
-        // to - covers both a single weekend day and a multi-day range that
-        // happens to fall wholly on a weekend.
-        if (workingDatesInRange(from, to).length === 0) {
-            return res.status(400).json({ message: "Leave cannot be applied on weekend days" });
+        // A range that's entirely weekend/holiday has no working day to apply
+        // leave to - covers both a single day and a multi-day range that
+        // happens to fall wholly on non-working days.
+        if ((await workingDatesInRange(companyId, from, to)).length === 0) {
+            return res.status(400).json({ message: "Leave cannot be applied on weekend or holiday days" });
         }
 
         if (await hasOverlappingLeave(employeeId, companyId, from, to)) {
@@ -153,7 +153,7 @@ router.post("/", verifyToken, async (req, res) => {
         }
 
         try {
-            await assertRangeNotPayrollLocked(employeeId, from, to);
+            await assertRangeNotPayrollLocked(employeeId, companyId, from, to);
         } catch (lockErr) {
             return res.status(lockErr.statusCode || 403).json({ message: lockErr.message });
         }
@@ -282,7 +282,7 @@ router.delete("/:leaveId", verifyToken, async (req, res) => {
         }
 
         try {
-            await assertRangeNotPayrollLocked(leave.employeeId, leave.fromDate, leave.toDate);
+            await assertRangeNotPayrollLocked(leave.employeeId, leave.companyId, leave.fromDate, leave.toDate);
         } catch (lockErr) {
             return res.status(lockErr.statusCode || 403).json({ message: lockErr.message });
         }

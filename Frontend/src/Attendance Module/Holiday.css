@@ -1,0 +1,464 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Sora:wght@600;700&display=swap');
+
+/* ── Page ── */
+.holiday-container {
+    padding: 36px 40px;
+    background-color: #eeeef8;
+    min-height: 100%;
+    font-family: 'DM Sans', sans-serif;
+}
+
+/* ── Header ── */
+.holiday-header {
+    margin-top: -15px;
+    margin-bottom: 32px;
+}
+
+.holiday-title {
+    font-family: 'Sora', sans-serif;
+    font-size: 30px;
+    font-weight: 700;
+    color: #1a1a2e;
+    letter-spacing: -0.02em;
+    margin-bottom: 6px;
+}
+
+.holiday-header p {
+    font-size: 14px;
+    color: #888;
+}
+
+/* ── Filter section ── */
+.holiday-filter-section {
+    background: #ffffff;
+    padding: 24px;
+    border-radius: 16px;
+    border: 1px solid #ececf5;
+    box-shadow: 0 2px 12px rgba(100, 80, 180, 0.06);
+    display: flex;
+    gap: 16px;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    margin-bottom: 24px;
+}
+
+.holiday-filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    width: 220px;
+}
+
+.holiday-filter-group label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #888;
+}
+
+.holiday-filter-group select {
+    padding: 11px 14px;
+    border: 1.5px solid #e4e4f0;
+    border-radius: 10px;
+    min-width: 200px;
+    font-size: 14px;
+    font-family: 'DM Sans', sans-serif;
+    color: #1a1a2e;
+    background: #f9f9fc;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+}
+
+.holiday-filter-group select:focus {
+    border-color: #7c5cbf;
+    box-shadow: 0 0 0 3px rgba(124, 92, 191, 0.1);
+    background: #fff;
+}
+
+/* ── Add Holiday button ── */
+.add-holiday-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 11px 20px;
+    background: linear-gradient(135deg, #7c5cbf, #5c3fa3);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+    text-decoration: none;
+    box-shadow: 0 4px 14px rgba(92, 63, 163, 0.3);
+    transition: opacity 0.2s, transform 0.15s;
+}
+
+.add-holiday-btn:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+}
+
+/* ── Table container ── */
+.holiday-table-container {
+    background: #ffffff;
+    border-radius: 16px;
+    border: 1px solid #ececf5;
+    box-shadow: 0 2px 12px rgba(100, 80, 180, 0.06);
+    overflow-x: auto;
+}
+
+.holiday-table-container table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+}
+
+.holiday-table-container thead {
+    background: #f9f9fc;
+    border-bottom: 2px solid #ececf5;
+}
+
+.holiday-table-container thead th {
+    padding: 26px 18px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #888;
+    text-align: center;
+}
+
+.holiday-table-container tbody td {
+    padding: 21px 18px;
+    border-top: 1px solid #f0f0f8;
+    font-size: 14px;
+    color: #3a3a5c;
+    text-align: center;
+}
+
+.holiday-table-container tbody tr:hover {
+    background: rgba(124, 92, 191, 0.04);
+}
+
+.holiday-name-cell {
+    font-weight: 600;
+    color: #1a1a2e;
+}
+
+.holiday-desc-cell {
+    color: #888;
+    font-size: 13px;
+    white-space: normal;
+    word-break: break-word;
+}
+
+.holiday-empty-row {
+    padding: 48px 18px !important;
+    color: #9a97b8;
+}
+
+/* ── Row action buttons ── */
+.holiday-actions {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: nowrap;
+}
+
+.holiday-action-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.15s;
+}
+
+.holiday-action-btn.edit {
+    background: rgba(124, 92, 191, 0.1);
+    color: #7c5cbf;
+}
+
+.holiday-action-btn.edit:hover {
+    background: rgba(124, 92, 191, 0.2);
+    transform: translateY(-1px);
+}
+
+.holiday-action-btn.delete {
+    background: rgba(220, 53, 69, 0.08);
+    color: #dc3545;
+}
+
+.holiday-action-btn.delete:hover {
+    background: rgba(220, 53, 69, 0.16);
+    transform: translateY(-1px);
+}
+
+/* ── Add/Edit form modal ── */
+.holiday-form-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(26, 26, 46, 0.45);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9998;
+    animation: holidayOverlayIn 0.2s ease;
+}
+
+.holiday-form {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 28px 30px;
+    width: 420px;
+    max-width: calc(100vw - 32px);
+    box-shadow: 0 20px 48px rgba(26, 26, 46, 0.22);
+    animation: holidayFormIn 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.holiday-form h4 {
+    font-family: 'Sora', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    color: #1a1a2e;
+    margin-bottom: 20px;
+}
+
+.holiday-form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 16px;
+}
+
+.holiday-form-group label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #888;
+}
+
+.holiday-form-group input,
+.holiday-form-group textarea,
+.holiday-date-picker {
+    padding: 11px 14px;
+    border: 1.5px solid #e4e4f0;
+    border-radius: 10px;
+    font-size: 14px;
+    font-family: 'DM Sans', sans-serif;
+    color: #1a1a2e;
+    background: #f9f9fc;
+    outline: none;
+    width: 100%;
+    box-sizing: border-box;
+    transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+}
+
+.holiday-form-group input:focus,
+.holiday-form-group textarea:focus,
+.holiday-date-picker:focus {
+    border-color: #7c5cbf;
+    box-shadow: 0 0 0 3px rgba(124, 92, 191, 0.1);
+    background: #fff;
+}
+
+.holiday-form-group textarea {
+    resize: vertical;
+    font-family: 'DM Sans', sans-serif;
+}
+
+.holiday-fy-readout {
+    padding: 11px 14px;
+    border-radius: 10px;
+    background: rgba(124, 92, 191, 0.08);
+    color: #7c5cbf;
+    font-size: 14px;
+    font-weight: 600;
+    width: fit-content;
+}
+
+.holiday-form-error {
+    background: rgba(220, 53, 69, 0.08);
+    color: #dc3545;
+    font-size: 13px;
+    padding: 10px 14px;
+    border-radius: 8px;
+    margin-bottom: 16px;
+}
+
+.holiday-form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 8px;
+}
+
+.btn-holiday-cancel {
+    padding: 10px 18px;
+    border-radius: 10px;
+    border: 1.5px solid #e4e4f0;
+    background: #fff;
+    color: #3a3a5c;
+    font-size: 14px;
+    font-weight: 600;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.btn-holiday-cancel:hover {
+    background: #f9f9fc;
+}
+
+.btn-holiday-save {
+    padding: 10px 20px;
+    border-radius: 10px;
+    border: none;
+    background: linear-gradient(135deg, #7c5cbf, #5c3fa3);
+    color: #fff;
+    font-size: 14px;
+    font-weight: 600;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+    box-shadow: 0 4px 14px rgba(92, 63, 163, 0.3);
+    transition: opacity 0.2s, transform 0.15s;
+}
+
+.btn-holiday-save:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+}
+
+.btn-holiday-save:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+@keyframes holidayOverlayIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+@keyframes holidayFormIn {
+    from { opacity: 0; transform: translateY(12px) scale(0.97); }
+    to   { opacity: 1; transform: translateY(0)    scale(1);    }
+}
+
+/* ── Toast notification ── */
+.holiday-toast {
+    position: fixed;
+    bottom: 32px;
+    right: 32px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 20px;
+    border-radius: 12px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    color: #fff;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+    z-index: 9999;
+    animation: holidayToastIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.holiday-toast-success {
+    background: linear-gradient(135deg, #7c5cbf, #5c3fa3);
+}
+
+.holiday-toast-delete {
+    background: linear-gradient(135deg, #e05260, #c0392b);
+}
+
+@keyframes holidayToastIn {
+    from { opacity: 0; transform: translateY(16px) scale(0.95); }
+    to   { opacity: 1; transform: translateY(0)   scale(1);     }
+}
+
+/* ── Delete confirmation ── */
+.holiday-confirm-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(26, 26, 46, 0.45);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9998;
+    animation: holidayOverlayIn 0.2s ease;
+}
+
+.holiday-confirm-dialog {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 26px 28px;
+    width: 320px;
+    max-width: calc(100vw - 32px);
+    box-shadow: 0 20px 48px rgba(26, 26, 46, 0.22);
+    text-align: center;
+    animation: holidayFormIn 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.holiday-confirm-dialog h4 {
+    font-family: 'Sora', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    color: #1a1a2e;
+    margin-bottom: 8px;
+}
+
+.holiday-confirm-dialog p {
+    font-size: 13px;
+    color: #888;
+    margin-bottom: 20px;
+}
+
+.holiday-confirm-actions {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+.btn-holiday-confirm-delete {
+    padding: 10px 20px;
+    border-radius: 10px;
+    border: none;
+    background: linear-gradient(135deg, #e05260, #c0392b);
+    color: #fff;
+    font-size: 14px;
+    font-weight: 600;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+    transition: opacity 0.2s, transform 0.15s;
+}
+
+.btn-holiday-confirm-delete:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+}
+
+.btn-holiday-confirm-cancel {
+    padding: 10px 20px;
+    border-radius: 10px;
+    border: 1.5px solid #e4e4f0;
+    background: #fff;
+    color: #3a3a5c;
+    font-size: 14px;
+    font-weight: 600;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.btn-holiday-confirm-cancel:hover {
+    background: #f9f9fc;
+}

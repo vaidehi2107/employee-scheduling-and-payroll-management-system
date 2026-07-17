@@ -4,6 +4,7 @@ import Employee from "../models/employee.js";
 import Payroll from "../models/payroll.js";
 import { verifyToken } from "../middleware.js";
 import { getAttendanceSummary } from "../services/getAttendanceSummary.js";
+import { getHolidayOnDate } from "../services/holidayHelper.js";
 
 const router = express.Router();
 
@@ -48,6 +49,11 @@ router.post("/attendance", verifyToken, async (req,res) => {
 
         if (isWeekend(attendanceDate)) {
             return res.status(400).json({ message: "Attendance cannot be marked on a weekend." });
+        }
+
+        const holiday = await getHolidayOnDate(req.companyId, attendanceDate);
+        if (holiday) {
+            return res.status(400).json({ message: `Attendance cannot be marked on a holiday (${holiday.name}).` });
         }
 
         if (attendanceDate < joiningDate) {
@@ -162,6 +168,11 @@ router.put("/attendance/update/:id", verifyToken, async (req,res) => {
 
         if (isWeekend(attendanceDate)) {
             return res.status(400).json({ message: "Attendance cannot be marked on a weekend." });
+        }
+
+        const holiday = await getHolidayOnDate(req.companyId, attendanceDate);
+        if (holiday) {
+            return res.status(400).json({ message: `Attendance cannot be marked on a holiday (${holiday.name}).` });
         }
 
         if (attendanceDate < joiningDate) {

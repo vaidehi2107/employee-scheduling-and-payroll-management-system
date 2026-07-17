@@ -16,6 +16,7 @@ import salaryRoutes from "./routes/salaryRoutes.js";
 import leaveRoutes from "./routes/leaveRoutes.js"; 
 import dashboardRoutes from "./routes/dashboardRoutes.js";
 import reportRoutes from "./routes/reportRoutes.js";
+import holidayRoutes from "./routes/holidayRoutes.js";
 
 const app = express();
 const PORT = 5000;
@@ -37,6 +38,7 @@ app.use("/api", salaryRoutes);
 app.use("/api/leaves", leaveRoutes);
 app.use("/api", dashboardRoutes);
 app.use("/api/reports", reportRoutes);
+app.use("/api", holidayRoutes);
 
 app.get("/", (req,res)=> {
     res.send("Hello World!");

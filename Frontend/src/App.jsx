@@ -6,6 +6,7 @@ import Home from "./Dashboard/Home";
 import Topbar from "./Topbar";
 import Sidebar from "./Sidebar";
 import Attendance from "./Attendance Module/Attendance";
+import Holiday from "./Attendance Module/Holiday";
 import Tax from "./Payroll Module/Tax";
 import RunPayroll from "./Payroll Module/RunPayroll";
 import PayrollHistory from "./Payroll Module/PayrollHistory";
@@ -82,6 +83,7 @@ function App() {
                     <Route path="/employees" element={<EmployeeList />} />
                     <Route path="/departments" element={<Department />} />
                     <Route path="/attendance" element={<Attendance />} />
+                    <Route path="/attendance/holidays" element={<Holiday />} />
                     <Route path="/tax" element={<Tax />} />
                     <Route path="/payroll" element={<RunPayroll />} />
                     <Route path="/payroll-history" element={<PayrollHistory />} />

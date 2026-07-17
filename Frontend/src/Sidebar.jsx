@@ -9,6 +9,15 @@ function Sidebar() {
     const isEmployeeActive =
         location.pathname === "/employees" || location.pathname === "/add-employee";
 
+    // Attendance sub-routes
+    const isAttendanceSectionActive = location.pathname.startsWith("/attendance");
+
+    // Keep submenu open if an attendance route is active, else respect toggle
+    const [attendanceOpen, setAttendanceOpen] = useState(isAttendanceSectionActive);
+
+    const toggleAttendance = () => setAttendanceOpen((prev) => !prev);
+
+
     // Payroll sub-routes
     const payrollRoutes = ["/payroll", "/payroll-history", "/tax"];
     const isPayrollSectionActive = payrollRoutes.some((r) =>
@@ -113,12 +122,40 @@ function Sidebar() {
                     </div>
                 )}
 
-                <NavLink
-                    to="/attendance"
-                    className={({ isActive }) => isActive ? "nav-item active" : "nav-item"}
+                {/* ── Attendance (parent toggle) ── */}
+                <button
+                    className={`nav-item nav-item--parent ${isAttendanceSectionActive ? "active" : ""}`}
+                    onClick={toggleAttendance}
+                    aria-expanded={attendanceOpen}
                 >
-                    Attendance
-                </NavLink>
+                    <span>Attendance</span>
+                    <span className={`nav-arrow ${attendanceOpen ? "nav-arrow--open" : ""}`}>
+                        ▾
+                    </span>
+                </button>
+
+                {attendanceOpen && (
+                    <div className="nav-submenu">
+                        <NavLink
+                            to="/attendance"
+                            end
+                            className={({ isActive }) =>
+                                isActive ? "nav-item nav-item--sub active" : "nav-item nav-item--sub"
+                            }
+                        >
+                            Mark Attendance
+                        </NavLink>
+
+                        <NavLink
+                            to="/attendance/holidays"
+                            className={({ isActive }) =>
+                                isActive ? "nav-item nav-item--sub active" : "nav-item nav-item--sub"
+                            }
+                        >
+                            Holidays
+                        </NavLink>
+                    </div>
+                )}
 
                 {/* ── Payroll (parent toggle) ── */}
                 <button

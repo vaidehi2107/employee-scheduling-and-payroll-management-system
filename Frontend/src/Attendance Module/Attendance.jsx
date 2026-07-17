@@ -32,10 +32,19 @@ const getMonthRange = (monthDate) => {
   return { start, end };
 };
 
+// Financial year label for a date, e.g. 1 Apr 2026 - 31 Mar 2027 -> "2026-2027"
+// (matches the FY convention used by the Holiday module)
+const getFinancialYear = (date) => {
+  const d = new Date(date);
+  const startYear = d.getMonth() >= 3 ? d.getFullYear() : d.getFullYear() - 1;
+  return `${startYear}-${startYear + 1}`;
+};
+
 function Attendance(){
 
     const [employees, setEmployees] = useState([]);
     const [attendance, setAttendance] = useState([]);
+    const [holidays, setHolidays] = useState([]);
     const [summary, setSummary] = useState({ workingDays: 0, presentDays: 0, paidLeaveDays: 0, nonPaidLeaveDays: 0 });
 
     const [employeeId, setEmployeeId] = useState("");
@@ -75,6 +84,26 @@ function Attendance(){
         const { start, end } = getMonthRange(selectedMonth);
         searchAttendance(start, end, employeeId);
     }, [employeeId, selectedMonth]);
+
+    // Load holidays for the FY covering the viewed month, so the calendar
+    // can mark holiday dates even though they never get an Attendance record
+    useEffect(() => {
+        if (!employeeId) {
+            setHolidays([]);
+            return;
+        }
+        fetchHolidays();
+    }, [employeeId, selectedMonth]);
+
+    const fetchHolidays = async () => {
+        try {
+            const financialYear = getFinancialYear(selectedMonth);
+            const response = await API.get("/holidays", { params: { financialYear } });
+            setHolidays(response.data.holidays || []);
+        } catch (err) {
+            console.log(err);
+        }
+    };
 
     const searchAttendance = async (startDate, endDate, empId) => {
         try {
@@ -134,6 +163,10 @@ function Attendance(){
         }
     };
 
+    const holidayByDate = useMemo(() => {
+        return new Map(holidays.map((h) => [new Date(h.date).toDateString(), h]));
+    }, [holidays]);
+
     const calendarDays = useMemo(() => {
         if (!employeeId) return [];
         const { start, end } = getMonthRange(selectedMonth);
@@ -145,20 +178,22 @@ function Attendance(){
             const isWeekend = dow === 0 || dow === 6;
             const isFuture = dayDate > today;
             const record = attendance.find(item => isSameDay(new Date(item.date), dayDate));
+            const holiday = holidayByDate.get(dayDate.toDateString());
 
-            // A real record (leave applied ahead of time, a holiday marked
-            // in advance, etc.) always reflects its actual status, even on
-            // a future date. "Upcoming" only means "nothing recorded yet".
+            // A holiday always wins, whether it falls on a weekday or
+            // weekend, and whether it's in the past or upcoming - there's
+            // never an Attendance record for a holiday date to fall back on.
             let status;
-            if (isWeekend) status = "weekend";
+            if (holiday) status = "holiday";
+            else if (isWeekend) status = "weekend";
             else if (record) status = mapRecordStatus(record);
             else if (isFuture) status = "upcoming";
             else status = "absent";
 
-            days.push({ date: dayDate, isWeekend, isFuture, record, status });
+            days.push({ date: dayDate, isWeekend, isFuture, record, status, holidayName: holiday?.name });
         }
         return days;
-    }, [attendance, selectedMonth, employeeId, today]);
+    }, [attendance, holidayByDate, selectedMonth, employeeId, today]);
 
     const statusLabel = {
         present: "Present",
@@ -274,7 +309,10 @@ function Attendance(){
                       <td>{item ? formatTime(item.breakOut) : "—"}</td>
                       <td>{item ? formatTime(item.outTime) : "—"}</td>
                       <td>
-                        <span className={`status-badge status-${day.status}`}>
+                        <span
+                          className={`status-badge status-${day.status}`}
+                          title={day.status === "holiday" ? day.holidayName : undefined}
+                        >
                           {statusLabel[day.status]}
                         </span>
                       </td>

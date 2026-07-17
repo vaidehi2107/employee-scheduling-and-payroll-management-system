@@ -1,4 +1,5 @@
 import Attendance from "../models/attendance.js";
+import { getHolidayMap } from "./holidayHelper.js";
 
 export const getAttendanceSummary = async (employeeId, companyId, joiningDate, startDate, endDate) => {
 
@@ -14,6 +15,9 @@ export const getAttendanceSummary = async (employeeId, companyId, joiningDate, s
     const recordByDate = new Map(
         records.map(r => [new Date(r.date).toDateString(), { status: r.status, isHalfDay: !!r.isHalfDay }])
     );
+
+    //Map of date string -> holiday doc for every holiday in this range
+    const holidayByDate = await getHolidayMap(companyId, startDate, endDate);
 
     //Gets the current date/time, then zeroes out hours/minutes/seconds/ms so today represents midnight of today
     const today = new Date();
@@ -38,8 +42,9 @@ export const getAttendanceSummary = async (employeeId, companyId, joiningDate, s
 
         const isFuture = day > today;
         const isBeforeJoining = day < joinDate;
+        const isHoliday = holidayByDate.has(day.toDateString());
 
-        if (isWeekend || isFuture || isBeforeJoining) continue;
+        if (isWeekend || isFuture || isBeforeJoining || isHoliday) continue;
 
         const record = recordByDate.get(day.toDateString());
         const status = record?.status;
