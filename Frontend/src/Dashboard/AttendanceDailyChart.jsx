@@ -69,6 +69,10 @@ export default function AttendanceDailyChart({ month, year }) {
                         padding: 10,
                         cornerRadius: 8,
                         callbacks: {
+                            title: items => {
+                                const d = days[items[0].dataIndex];
+                                return d.holidayName ? `Day ${d.day} — ${d.holidayName}` : `Day ${d.day}`;
+                            },
                             afterTitle: items => {
                                 const d = days[items[0].dataIndex];
                                 if (!d.unmarked) return "";

@@ -1,6 +1,7 @@
 import Attendance from "../models/attendance.js";
 import Payroll from "../models/payroll.js";
 import { getHolidayMap } from "./holidayHelper.js";
+import { parseDateOnly, dateKey, dayOfWeek } from "../services/dateOnly.js";
 
 const MS_PER_DAY = 1000 * 60 * 60 * 24;
 
@@ -15,18 +16,20 @@ const LEAVE_STATUS = {
 // nothing useful to write for either - a leave day here shouldn't burn a
 // leave entitlement or overwrite a holiday.
 export async function workingDatesInRange(companyId, fromDate, toDate) {
+    const from = parseDateOnly(fromDate);
+    const to = parseDateOnly(toDate);
+
     const dates = [];
-    for (let cursor = new Date(fromDate); cursor <= toDate; cursor = new Date(cursor.getTime() + MS_PER_DAY)) {
+    for (let cursor = from.getTime(); cursor <= to.getTime(); cursor += MS_PER_DAY) {
         const day = new Date(cursor);
-        day.setHours(0, 0, 0, 0);
-        const dow = day.getDay();
+        const dow = dayOfWeek(day);
         if (dow !== 0 && dow !== 6) dates.push(day);
     }
 
     if (dates.length === 0) return dates;
 
     const holidayByDate = await getHolidayMap(companyId, dates[0], dates[dates.length - 1]);
-    return dates.filter(day => !holidayByDate.has(day.toDateString()));
+    return dates.filter(day => !holidayByDate.has(dateKey(day)));
 }
 
 // Throws a 403 if payroll has already been generated for any working day in

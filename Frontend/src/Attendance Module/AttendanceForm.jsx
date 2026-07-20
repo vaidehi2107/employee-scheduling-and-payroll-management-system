@@ -1,7 +1,18 @@
 import { useEffect, useState } from "react";
 import DatePicker from "react-datepicker";
+import { format } from "date-fns";
 import API from "../api.js";
 import "./AttendanceForm.css";
+
+// Attendance dates come from the server as UTC midnight of the intended
+// calendar day. Handing that straight to `new Date(...)` for the picker
+// uses the browser's LOCAL timezone, which only shows the right day for
+// timezones at or ahead of UTC - this re-anchors the same Y/M/D to local
+// midnight so the picker prefills the correct day in any timezone.
+const toDisplayDate = (date) => {
+  const [y, m, d] = new Date(date).toISOString().slice(0, 10).split("-").map(Number);
+  return new Date(y, m - 1, d);
+};
 
 function AttendanceForm({ isOpen, onClose, onSuccess, selectedAttendance }) {
   const [employees, setEmployees] = useState([]);
@@ -32,7 +43,7 @@ function AttendanceForm({ isOpen, onClose, onSuccess, selectedAttendance }) {
     if (selectedAttendance) {
       setFormData({
         employeeId: selectedAttendance.employeeId?._id || "",
-        date: selectedAttendance.date ? new Date(selectedAttendance.date) : null,
+        date: selectedAttendance.date ? toDisplayDate(selectedAttendance.date) : null,
         inTime:   selectedAttendance.inTime   || "",
         breakIn:  selectedAttendance.breakIn  || "",
         breakOut: selectedAttendance.breakOut || "",
@@ -54,14 +65,23 @@ function AttendanceForm({ isOpen, onClose, onSuccess, selectedAttendance }) {
 
   const handleSubmit = async () => {
     try {
+      const payload = {
+        ...formData,
+        // Send the plain calendar day the user picked ("YYYY-MM-DD"), not
+        // the raw Date object - JSON-serializing a Date calls toISOString()
+        // internally, which converts local midnight to UTC and can roll it
+        // back to the previous day.
+        date: formData.date ? format(formData.date, "yyyy-MM-dd") : null
+      };
+
       if (selectedAttendance) {
         await API.put(
           `/attendance/update/${selectedAttendance._id}`,
-          formData
+          payload
         );
         onSuccess(true); // true = is edit
       } else {
-        await API.post("/attendance", formData);
+        await API.post("/attendance", payload);
         onSuccess(false); // false = is add
       }
       onClose();
@@ -111,7 +131,7 @@ function AttendanceForm({ isOpen, onClose, onSuccess, selectedAttendance }) {
           />
           {minDate && (
             <small style={{ color: "#888", fontSize: "11px", marginTop: "4px", display: "block" }}>
-              Earliest allowed: {minDate.toLocaleDateString("en-US")}
+              Earliest allowed: {format(minDate, "MM-dd-yyyy")}
             </small>
           )}
         </div>

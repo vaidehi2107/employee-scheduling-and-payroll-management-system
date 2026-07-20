@@ -1,6 +1,7 @@
 import express from "express";
 import Holiday from "../models/holidaySchema.js";
 import { verifyToken } from "../middleware.js";
+import { parseDateOnly, endOfDateOnly } from "../services/dateOnly.js";
 
 const router = express.Router();
 
@@ -12,7 +13,7 @@ router.post("/holidays", verifyToken, async (req,res) => {
             return res.status(400).json({message: "Financial Year, Holiday Name and Date are required."});
         }
 
-        const parsedDate = new Date(date);
+        const parsedDate = parseDateOnly(date);
         if (isNaN(parsedDate.getTime())) {
             return res.status(400).json({message: "Invalid date."});
         }
@@ -70,14 +71,14 @@ router.get("/holidays/check", verifyToken, async (req,res) => {
             return res.status(400).json({message: "Date is required."});
         }
 
-        const parsedDate = new Date(date);
+        const parsedDate = parseDateOnly(date);
         if (isNaN(parsedDate.getTime())) {
             return res.status(400).json({message: "Invalid date."});
         }
 
         // normalize to start/end of day so time-of-day differences don't cause a miss
-        const startOfDay = new Date(parsedDate.setHours(0,0,0,0));
-        const endOfDay = new Date(parsedDate.setHours(23,59,59,999));
+        const startOfDay = parseDateOnly(date);
+        const endOfDay = endOfDateOnly(date);
 
         const holiday = await Holiday.findOne({
             companyId: req.companyId,
@@ -103,7 +104,7 @@ router.put("/holiday/:id", verifyToken, async (req, res) => {
             return res.status(400).json({message: "Financial Year, Holiday Name and Date are required."});
         }
 
-        const parsedDate = new Date(date);
+        const parsedDate = parseDateOnly(date);
         if (isNaN(parsedDate.getTime())) {
             return res.status(400).json({message: "Invalid date."});
         }

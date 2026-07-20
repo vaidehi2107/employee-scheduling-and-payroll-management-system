@@ -24,6 +24,15 @@ const isSameDay = (a, b) =>
   a.getMonth() === b.getMonth() &&
   a.getDate() === b.getDate();
 
+// Attendance/holiday dates come from the server as UTC midnight of the
+// intended calendar day. Comparing them with local Date getters only gives
+// the right day in timezones at or ahead of UTC - this re-anchors the same
+// Y/M/D to local midnight so the calendar grid is correct in any timezone.
+const toDisplayDate = (date) => {
+  const [y, m, d] = new Date(date).toISOString().slice(0, 10).split("-").map(Number);
+  return new Date(y, m - 1, d);
+};
+
 // First and last day of the month containing `monthDate`
 const getMonthRange = (monthDate) => {
   const start = new Date(monthDate.getFullYear(), monthDate.getMonth(), 1);
@@ -109,7 +118,7 @@ function Attendance(){
         try {
             const response = await API.get(
                 "/attendance/filter",
-                { params: { employeeId: empId, startDate: startDate.toISOString(), endDate: endDate.toISOString() } }
+                { params: { employeeId: empId, startDate: format(startDate, "yyyy-MM-dd"), endDate: format(endDate, "yyyy-MM-dd") } }
             );
             setAttendance(response.data.records);
             setSummary(response.data.summary || { workingDays: 0, presentDays: 0, paidLeaveDays: 0, nonPaidLeaveDays: 0 });
@@ -164,7 +173,7 @@ function Attendance(){
     };
 
     const holidayByDate = useMemo(() => {
-        return new Map(holidays.map((h) => [new Date(h.date).toDateString(), h]));
+        return new Map(holidays.map((h) => [toDisplayDate(h.date).toDateString(), h]));
     }, [holidays]);
 
     const calendarDays = useMemo(() => {
@@ -177,7 +186,7 @@ function Attendance(){
             const dow = dayDate.getDay();
             const isWeekend = dow === 0 || dow === 6;
             const isFuture = dayDate > today;
-            const record = attendance.find(item => isSameDay(new Date(item.date), dayDate));
+            const record = attendance.find(item => isSameDay(toDisplayDate(item.date), dayDate));
             const holiday = holidayByDate.get(dayDate.toDateString());
 
             // A holiday always wins, whether it falls on a weekday or

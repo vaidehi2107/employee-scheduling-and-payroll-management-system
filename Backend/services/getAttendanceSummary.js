@@ -1,5 +1,6 @@
 import Attendance from "../models/attendance.js";
 import { getHolidayMap } from "./holidayHelper.js";
+import { parseDateOnly, dateKey, dayOfWeek } from "../services/dateOnly.js";
 
 export const getAttendanceSummary = async (employeeId, companyId, joiningDate, startDate, endDate) => {
 
@@ -11,21 +12,19 @@ export const getAttendanceSummary = async (employeeId, companyId, joiningDate, s
         date: {$gte: startDate, $lte: endDate}
     }).select("date status isHalfDay");
 
-    //Map of date string (e.g. "Mon Jun 02 2026") -> that day's { status, isHalfDay }
+    //Map of "YYYY-MM-DD" -> that day's { status, isHalfDay }
     const recordByDate = new Map(
-        records.map(r => [new Date(r.date).toDateString(), { status: r.status, isHalfDay: !!r.isHalfDay }])
+        records.map(r => [dateKey(r.date), { status: r.status, isHalfDay: !!r.isHalfDay }])
     );
 
-    //Map of date string -> holiday doc for every holiday in this range
+    //Map of "YYYY-MM-DD" -> holiday doc for every holiday in this range
     const holidayByDate = await getHolidayMap(companyId, startDate, endDate);
 
-    //Gets the current date/time, then zeroes out hours/minutes/seconds/ms so today represents midnight of today
-    const today = new Date();
-    today.setHours(0,0,0,0);
+    //Today's calendar day (UTC), for past/future comparisons
+    const today = parseDateOnly(new Date());
 
-    //Same idea — converts the employee's joiningDate into a Date object and strips the time
-    const joinDate = new Date(joiningDate);
-    joinDate.setHours(0, 0, 0, 0);
+    //Employee's joining day as a plain calendar day
+    const joinDate = parseDateOnly(joiningDate);
 
     let workingDays = 0;
 
@@ -33,20 +32,21 @@ export const getAttendanceSummary = async (employeeId, companyId, joiningDate, s
     let paidLeaveDays = 0;
     let nonPaidLeaveDays = 0;
 
-    for(let cursor = new Date(startDate); cursor <= endDate; cursor.setDate(cursor.getDate() + 1)){
-        const day = new Date(cursor);
-        day.setHours(0,0,0,0);
+    const start = parseDateOnly(startDate);
+    const end = parseDateOnly(endDate);
 
-        const dow = day.getDay();
+    for (let day = start; day <= end; day = new Date(day.getTime() + 24 * 60 * 60 * 1000)) {
+        const dow = dayOfWeek(day);
         const isWeekend = dow === 0 || dow === 6; //0-sunday,6-saturday
 
         const isFuture = day > today;
         const isBeforeJoining = day < joinDate;
-        const isHoliday = holidayByDate.has(day.toDateString());
+        const key = dateKey(day);
+        const isHoliday = holidayByDate.has(key);
 
         if (isWeekend || isFuture || isBeforeJoining || isHoliday) continue;
 
-        const record = recordByDate.get(day.toDateString());
+        const record = recordByDate.get(key);
         const status = record?.status;
         const isHalfDay = !!record?.isHalfDay;
 

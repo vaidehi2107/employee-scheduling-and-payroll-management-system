@@ -42,8 +42,11 @@ async function computePayrollForEmployee(employeeId, companyId, month, year) {
 
     // 3. Attendance for the month — workingDays excludes Sat/Sun, future dates,
     //    and days before the employee's joining date; presentDays/absentDays follow from that.
-    const periodStart = new Date(year, month - 1, 1);
-    const periodEnd = new Date(year, month, 0, 23, 59, 59); // last day of month
+    //    Built directly in UTC (not the local `new Date(year, month-1, 1)` constructor)
+    //    so periodStart/periodEnd land on exact UTC midnight, matching the UTC-midnight
+    //    convention every Attendance.date value uses (see dateOnly.js). 
+    const periodStart = new Date(Date.UTC(year, month - 1, 1));
+    const periodEnd = new Date(Date.UTC(year, month, 0, 23, 59, 59, 999)); // last day of month, UTC
 
     // If the employee hadn't joined yet at any point during this period
     if (employee.joiningDate && new Date(employee.joiningDate) > periodEnd) {

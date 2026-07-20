@@ -25,6 +25,17 @@ const getFinancialYearOptions = () => {
     return years;
 };
 
+// Holiday dates are stored as UTC midnight of the intended calendar day.
+// Formatting/editing that value with a plain `new Date(holiday.date)` uses
+// the browser's LOCAL timezone, which only shows the right day for
+// timezones at or ahead of UTC (e.g. IST) - anywhere behind UTC would roll
+// it back a day. This re-anchors the same Y/M/D to local midnight so
+// date-fns formatting and the DatePicker are correct in any timezone.
+const toDisplayDate = (date) => {
+    const [y, m, d] = new Date(date).toISOString().slice(0, 10).split("-").map(Number);
+    return new Date(y, m - 1, d);
+};
+
 const emptyForm = { name: "", date: new Date(), description: "" };
 
 function Holiday() {
@@ -77,7 +88,7 @@ function Holiday() {
         setSelectedHoliday(holiday);
         setForm({
             name: holiday.name,
-            date: new Date(holiday.date),
+            date: toDisplayDate(holiday.date),
             description: holiday.description || ""
         });
         setFormError("");
@@ -100,7 +111,10 @@ function Holiday() {
         const payload = {
             financialYear: getFinancialYear(form.date),
             name: form.name.trim(),
-            date: form.date.toISOString(),
+            // Send the plain calendar day the user picked ("YYYY-MM-DD"),
+            // not toISOString() - that converts the picker's local midnight
+            // to UTC and can roll it back to the previous day.
+            date: format(form.date, "yyyy-MM-dd"),
             description: form.description.trim()
         };
 
@@ -195,8 +209,8 @@ function Holiday() {
                         )}
                         {holidays.map((holiday) => (
                             <tr key={holiday._id}>
-                                <td>{format(new Date(holiday.date), "MM-dd-yyyy")}</td>
-                                <td>{format(new Date(holiday.date), "EEEE")}</td>
+                                <td>{format(toDisplayDate(holiday.date), "MM-dd-yyyy")}</td>
+                                <td>{format(toDisplayDate(holiday.date), "EEEE")}</td>
                                 <td className="holiday-name-cell">{holiday.name}</td>
                                 <td className="holiday-desc-cell">{holiday.description || "—"}</td>
                                 <td>
@@ -245,7 +259,8 @@ function Holiday() {
                                 <DatePicker
                                     selected={form.date}
                                     onChange={(date) => setForm({ ...form, date })}
-                                    dateFormat="MMMM d, yyyy"
+                                    dateFormat="MM-dd-yyyy"
+                                    placeholderText="MM-DD-YYYY"
                                     className="holiday-date-picker"
                                 />
                             </div>

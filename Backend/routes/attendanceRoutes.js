@@ -5,6 +5,7 @@ import Payroll from "../models/payroll.js";
 import { verifyToken } from "../middleware.js";
 import { getAttendanceSummary } from "../services/getAttendanceSummary.js";
 import { getHolidayOnDate } from "../services/holidayHelper.js";
+import { parseDateOnly, endOfDateOnly, dayOfWeek, formatMDY } from "../services/dateOnly.js";
 
 const router = express.Router();
 
@@ -25,7 +26,7 @@ const isLockedByPayroll = async (attendanceId) => {
 // Weekends aren't working days - attendance is never marked for them
 // (they render as "Week Off" automatically), so block create/edit outright.
 const isWeekend = (date) => {
-    const dow = date.getDay();
+    const dow = dayOfWeek(date);
     return dow === 0 || dow === 6;
 };
 
@@ -41,11 +42,8 @@ router.post("/attendance", verifyToken, async (req,res) => {
             return res.status(404).json({message: "Employee not found"});
         }
 
-        const attendanceDate = new Date(req.body.date);
-        const joiningDate = new Date(employee.joiningDate);
-
-        attendanceDate.setHours(0, 0, 0, 0);
-        joiningDate.setHours(0, 0, 0, 0);
+        const attendanceDate = parseDateOnly(req.body.date);
+        const joiningDate = parseDateOnly(employee.joiningDate);
 
         if (isWeekend(attendanceDate)) {
             return res.status(400).json({ message: "Attendance cannot be marked on a weekend." });
@@ -58,12 +56,13 @@ router.post("/attendance", verifyToken, async (req,res) => {
 
         if (attendanceDate < joiningDate) {
             return res.status(400).json({
-                message: `Attendance date cannot be before joining date (${joiningDate.toDateString()}).`
+                message: `Attendance date cannot be before joining date (${formatMDY(joiningDate)}).`
             });
         }
 
         const attendance = new Attendance({
             ...req.body,
+            date: attendanceDate,
             companyId: req.companyId
         });
         const savedAttendance = await attendance.save();
@@ -85,8 +84,8 @@ router.get("/attendance/filter", verifyToken, async (req,res) => {
 
         if(startDate && endDate) {
             filter.date = {
-                $gte: new Date(startDate),
-                $lte: new Date(endDate)
+                $gte: parseDateOnly(startDate),
+                $lte: endOfDateOnly(endDate)
             };
         }
 
@@ -116,8 +115,8 @@ router.get("/attendance/filter", verifyToken, async (req,res) => {
                     employeeId,
                     req.companyId,
                     employee.joiningDate,
-                    new Date(startDate),
-                    new Date(endDate)
+                    parseDateOnly(startDate),
+                    parseDateOnly(endDate)
                 );
             }
         }
@@ -160,11 +159,8 @@ router.put("/attendance/update/:id", verifyToken, async (req,res) => {
             return res.status(404).json({message: "Employee not found"});
         }
 
-        const attendanceDate = new Date(req.body.date);
-        const joiningDate = new Date(employee.joiningDate);
-
-        attendanceDate.setHours(0, 0, 0, 0);
-        joiningDate.setHours(0, 0, 0, 0);
+        const attendanceDate = parseDateOnly(req.body.date);
+        const joiningDate = parseDateOnly(employee.joiningDate);
 
         if (isWeekend(attendanceDate)) {
             return res.status(400).json({ message: "Attendance cannot be marked on a weekend." });
@@ -177,13 +173,13 @@ router.put("/attendance/update/:id", verifyToken, async (req,res) => {
 
         if (attendanceDate < joiningDate) {
             return res.status(400).json({
-                message: `Attendance date cannot be before joining date (${joiningDate.toDateString()}).`
+                message: `Attendance date cannot be before joining date (${formatMDY(joiningDate)}).`
             });
         }
 
         const updatedAttendance = await Attendance.findByIdAndUpdate(
                 id,
-                { ...req.body },
+                { ...req.body, date: attendanceDate },
                 { new: true }
             );
         res.json(updatedAttendance);

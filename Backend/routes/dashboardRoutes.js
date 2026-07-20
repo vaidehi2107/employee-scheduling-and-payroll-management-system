@@ -2,7 +2,9 @@ import express from "express";
 import mongoose from "mongoose";
 import Employee from "../models/employee.js";
 import Attendance from "../models/attendance.js";
+import Holiday from "../models/holidaySchema.js";
 import { verifyToken } from "../middleware.js";
+import { dateKey, dayOfWeek } from "../services/dateOnly.js";
 
 const router = express.Router();
 
@@ -17,9 +19,9 @@ router.get("/dashboard/attendance/daily-summary", verifyToken, async (req, res) 
         const monthNum = Number(month);
         const yearNum = Number(year);
 
-        const periodStart = new Date(yearNum, monthNum - 1, 1);
-        const periodEnd = new Date(yearNum, monthNum, 0, 23, 59, 59);
-        const totalDaysInMonth = periodEnd.getDate();
+        const periodStart = new Date(Date.UTC(yearNum, monthNum - 1, 1));
+        const periodEnd = new Date(Date.UTC(yearNum, monthNum, 0, 23, 59, 59));
+        const totalDaysInMonth = periodEnd.getUTCDate();
 
         const activeEmployeeCount = await Employee.countDocuments({
             companyId,
@@ -43,9 +45,21 @@ router.get("/dashboard/attendance/daily-summary", verifyToken, async (req, res) 
             .populate("employeeId", "firstName lastName")
             .lean();
 
+        // Holidays never get an Attendance row (marking attendance on a
+        // holiday is blocked, and leave sync skips them too), so they can't
+        // be inferred from records the way "Present"/"Paid Leave" can -
+        // they have to be pulled from the Holiday collection directly.
+        const holidays = await Holiday.find({
+            companyId,
+            date: { $gte: periodStart, $lte: periodEnd }
+        }).select("date name").lean();
+        const holidayByDate = new Map(
+            holidays.map(h => [dateKey(h.date), h.name])
+        );
+
         const recordsByDate = new Map();
         for (const r of records) {
-            const key = new Date(r.date).toISOString().slice(0, 10);
+            const key = dateKey(r.date);
             if (!recordsByDate.has(key)) recordsByDate.set(key, []);
             recordsByDate.get(key).push(r);
         }
@@ -56,7 +70,7 @@ router.get("/dashboard/attendance/daily-summary", verifyToken, async (req, res) 
         // So they can't be detected from "Week Off" records the way an
         // actual company Holiday can - detect them by day-of-week directly.
         const isWeekend = (date) => {
-            const dow = date.getDay();
+            const dow = dayOfWeek(date);
             return dow === 0 || dow === 6;
         };
 
@@ -70,8 +84,8 @@ router.get("/dashboard/attendance/daily-summary", verifyToken, async (req, res) 
 
         const days = [];
         for (let d = 1; d <= totalDaysInMonth; d++) {
-            const dateObj = new Date(yearNum, monthNum - 1, d);
-            const key = dateObj.toISOString().slice(0, 10);
+            const dateObj = new Date(Date.UTC(yearNum, monthNum - 1, d));
+            const key = dateKey(dateObj);
             const dayRecords = recordsByDate.get(key) || [];
 
             const buckets = { present: [], paidLeave: [], nonPaidLeave: [], nonWorking: [] };
@@ -90,7 +104,9 @@ router.get("/dashboard/attendance/daily-summary", verifyToken, async (req, res) 
                 buckets[bucketKey].push({ name: empName || "Unknown employee", isHalfDay: !!r.isHalfDay });
             }
 
-            const isNonWorkingDay = isWeekend(dateObj) ||
+            const holidayName = holidayByDate.get(key);
+
+            const isNonWorkingDay = isWeekend(dateObj) || !!holidayName ||
                 (activeEmployeeCount > 0 && buckets.nonWorking.length >= activeEmployeeCount / 2);
 
             // On a non-working day, fold every active employee who doesn't
@@ -121,6 +137,7 @@ router.get("/dashboard/attendance/daily-summary", verifyToken, async (req, res) 
                 nonWorking: buckets.nonWorking.length,
                 unmarked: unmarkedNames.length,
                 isNonWorkingDay,
+                holidayName: holidayName || null,
                 names: {
                     present: buckets.present,
                     paidLeave: buckets.paidLeave,
