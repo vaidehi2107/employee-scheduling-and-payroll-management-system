@@ -25,6 +25,7 @@ import PublicJobDetail from "./Recruitment Module/Public Pages/PublicJobDetail";
 import SalaryStructure from "./Employee Module/SalaryStructure";
 import PayrollReport from "./Reports Module/PayrollReport";
 import LeaveReport from "./Reports Module/LeaveReport";
+import CalendarView from "./Calendar Module/CalendarView";
 
 function AppLayout() {
     return (
@@ -82,6 +83,7 @@ function App() {
                     <Route path="/add-employee" element={<EmployeeForm />} />
                     <Route path="/employees" element={<EmployeeList />} />
                     <Route path="/departments" element={<Department />} />
+                    <Route path="/calendar-view" element={<CalendarView />} />
                     <Route path="/attendance" element={<Attendance />} />
                     <Route path="/attendance/holidays" element={<Holiday />} />
                     <Route path="/tax" element={<Tax />} />

@@ -73,6 +73,13 @@ function Sidebar() {
                     Dashboard
                 </NavLink>
 
+                <NavLink
+                    to="/calendar-view"
+                    className={({ isActive }) => isActive ? "nav-item active" : "nav-item"}
+                >
+                    Calendar View
+                </NavLink>
+
                  <NavLink
                     to="/departments"
                     className={({ isActive }) => isActive ? "nav-item active" : "nav-item"}

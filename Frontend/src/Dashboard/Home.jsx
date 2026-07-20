@@ -34,11 +34,15 @@ function Home() {
             // /dashboard/attendance/daily-summary returns { days }, same shape the chart uses
             const days = dailyRes.data.days || [];
 
-            // Pending payrolls = payrolls generated this month
-            const thisMonthPayrolls = payrolls.filter(p => {
-                const d = new Date(p.periodEnd);
-                return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
-            });
+            // Pending payrolls = payrolls whose pay period is this month.
+            // Filter on the payroll's own `month`/`year` fields (plain numbers,
+            // set server-side) rather than parsing `periodEnd` - periodEnd is
+            // stored at 23:59:59.999 UTC on the last day of the month, and
+            // `new Date(...).getMonth()` reads it back in local time, which
+            // rolls it into the next month for any timezone ahead of UTC (e.g. IST).
+            const thisMonthPayrolls = payrolls.filter(p =>
+                p.month === now.getMonth() + 1 && p.year === now.getFullYear()
+            );
 
             // Attendance rate = average of each working day's present rate,
             // same calculation the daily chart is built from (not just
